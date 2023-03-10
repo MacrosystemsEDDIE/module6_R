@@ -15,9 +15,4 @@ Additionally this repository, and all student repositories, includes most of the
 - `rubric.md` the rubric for how the module will be assessed.
 - `.gitignore` an optional file, used to ignore common file types we don't want to accidentally commit to GitHub. Most projects should use this. 
 - `*.Rproj` an R-Project file created by RStudio for its own configuration of the repo files. Some people prefer to `.gitignore` this file. It is optional for team repos to ignore or commit their own `<REPO-NAME>.Rproj` file. 
-Footer
-© 2023 GitHub, Inc.
-Footer navigation
-Terms
-Privacy
-Security
+
