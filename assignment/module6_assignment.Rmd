@@ -314,11 +314,7 @@ A parameter is a value in a model that describes the rate of change in those sta
 
 **What is a parameter distribution?**
 
-A parameter distribution shows the possible values for a parameter value and how often they occur. For example, a normal distribution of a parameter has a bell-shaped curve, and the median is the most likely value of that parameter.
-
-**What is a parameter distribution?**
-
-A parameter distribution shows the possible values for a parameter value and how often they occur. For example, a normal distribution of a parameter has a bell-shaped curve, and the median is the most likely value of that parameter.
+A parameter distribution shows the possible values for a parameter value and how often they occur. For example, a normal distribution of a parameter has a bell-shaped curve, and the mean is the most likely value of that parameter.
 
 ```{r}
 # Build data frame to fit model
