@@ -6,7 +6,8 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+#knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(eval = FALSE)
 ```
 
 ## Purpose of this R Markdown
@@ -17,9 +18,9 @@ https://macrosystemseddie.shinyapps.io/module6/.
 Alternatively, students can complete this version of the module instead of the Shiny app version.  
   
 ## Summary
-Ecological forecasting is a tool that can be used for understanding and predicting changes in populations, communities, and ecosystems. Ecological forecasting is an emerging approach which provides an estimate of the future state of an ecological system with uncertainty, allowing society to prepare for changes in important ecosystem services. Forecast uncertainty is derived from multiple sources, including model parameters, driver data, among others. Knowing the uncertainty associated with a forecast enables forecast users to evaluate the forecast and make more informed decisions. Ecological forecasters develop and update forecasts using the iterative forecasting cycle, in which they make a hypothesis of how an ecological system works; embed their hypothesis in a model; and use the model to make a forecast of future conditions and quantify forecast uncertainty. There are a number of approaches that forecasters can use to reduce uncertainty, which will be explored in this module.  
+**Ecological forecasting** is a tool that can be used for understanding and predicting changes in populations, communities, and ecosystems. Ecological forecasting is an emerging approach which provides an estimate of the future state of an ecological system with uncertainty, allowing society to prepare for changes in important ecosystem services. Forecast **uncertainty** is derived from multiple sources, including model parameters and driver data, among others. Knowing the uncertainty associated with a forecast enables forecast users to evaluate the forecast and make more informed decisions. Ecological forecasters develop and update forecasts using the iterative forecasting cycle, in which they make a hypothesis of how an ecological system works; embed their hypothesis in a model; and use the model to make a forecast of future conditions and quantify forecast uncertainty. There are a number of approaches that forecasters can use to reduce uncertainty, which will be explored in this module.  
   
-This module will guide you through an exploration of the sources of uncertainty within an ecological forecast, how uncertainty can be quantified, and steps which can be taken to reduce the uncertainty in a forecast you develop for an ecological site of your choice.  
+This module will guide you through an exploration of the sources of uncertainty within an ecological forecast, how uncertainty can be quantified, and steps which can be taken to reduce the uncertainty in a forecast you develop for a lake ecosystem.  
   
 ## Learning Outcomes
 1. Define ecological forecast uncertainty.  
@@ -41,7 +42,7 @@ Uncertainty comes from natural variability in the environment and imperfect know
   
 **Why is uncertainty important to quantify for an ecological forecast?**. 
   
-Knowing the uncertainty in a forecast allows forecast users to make informed decisions based on the potential future scenarios and prepare accordingly.  
+Knowing the uncertainty in a forecast allows forecast users to make informed decisions based on the range of forecasted outcomes and prepare accordingly.  
   
 ## Overview
 Come back and fill this in once you have fleshed out the rest.  
@@ -67,11 +68,13 @@ library(ggthemes)
 Lake Barco is one of the lake sites in the U.S. National Ecological Observatory Network (NEON). Please refer to https://www.neonscience.org/field-sites/barc to learn more about this site.  
   
 #### Water Temperature
-Water temperature exerts a major influence on biological activity and growth, has an effect on water chemistry, can influence water quantity measurements, and governs the kinds of organisms that live in water bodies.  
+Water temperature exerts a major influence on biological activity and growth, has an effect on water chemistry, can influence water quantity measurements, and governs the kinds of organisms that live in water bodies. 
+
+Water temperature can have important effects on water quality, as changes in water temperature can directly or indirectly affect water quality variables such as dissolved oxygen, nutrient and heavy metal concentrations, and algae concentrations.
   
-Freshwater ecosystems are currently experiencing a multitude of stressors such as landuse change and climate change.  
+Freshwater ecosystems are currently experiencing a multitude of stressors such as land use change and climate change, which can affect water temperature.  
   
-Being able to predict how such systems can change in the short-term (up to 7-days into the future) will provide natural resource managers with critical information to take pro-active actions to prevent degradation of water quality.  
+Being able to predict how water temperature may change in the short-term (up to 7-days into the future) can provide natural resource managers with critical information to take pro-active actions to prevent degradation of water quality.  
 ```{r}
 lake <- "BARC" #this is the four-letter site code corresponding to Lake Barco
 
@@ -129,9 +132,10 @@ p1
 ```
 
 ### 2. Read in and visualize an air temperature forecast for Lake Barco 
+We expect that future air temperatures will affect future water temperatures, and so we will use air temperature forecasts to help create water temperature forecasts.  
+  
 We have obtained an air temperature forecast for Lake Barco from the U.S. National Oceanic and Atmospheric Administration Global Ensemble Forecast System (NOAA GEFS). NOAA GEFS forecasts are provided in a type of file called a **netcdf** file. In brief, netcdfs are data frames that have multiple dimensions (more than the two dimensions represented by rows and columns in a typical spreadsheet). This netcdf file format requires some wrangling in order to pull it into R and format it as a two-dimensional data frame. Here, we sequentially open several netcdf files which contain NOAA forecast data and combine the information we need from each file so that we end up with a two-dimensional data frame containing a 7-day-ahead air temperature forecast with 30 ensemble members.  
   
-We expect that future air temperatures will affect future water temperatures, and so we will use the NOAA GEFS air temperature forecasts to create water temperature forecasts below.
 ```{r}
 # Name our forecast date: we will be working with a NOAA forecast generated on 2020-09-25
 fc_date = "2020-09-25"
@@ -435,12 +439,12 @@ There is often the possibility that different parameter sets can yield similar m
 
 Using parameter distributions allows for a better representation of the potential predicted outcomes, leading to better quantification of the uncertainty.  
   
-Here, you will use the standard errors of the parameters we estimated to generate distributions around each model parameter. You will then generate water temperature forecasts using these parameter distributions to incorporate parameter uncertainty into your water temperature forecasts.
+Here, you will use the standard errors of the parameters we estimated to generate distributions around each model parameter. You will then use these parameter distributions to incorporate parameter uncertainty into your water temperature forecasts.
 
-Our model has three parameters: $/beta_0$, the intercept of the linear regression, $/beta_1$, the coefficient on tomorrow's air temperature, and $\beta_2$, the coefficient on today's water temperature. 
+Our model has three parameters: $\beta_0$, the intercept of the linear regression, $\beta_1$, the coefficient on tomorrow's air temperature, and $\beta_2$, the coefficient on today's water temperature. 
 
 $$WaterTemp_{t+1} = \beta_0 + \beta_1*AirTemp_{t+1} + \beta_2*WaterTemp_t$$
-When we fit our model, we obtained an estimate of the error around the mean of each of these parameters, which is stored in the `params.se` object. So instead of thinking of parameters as fixed values, we can think of them as distributions (here, a normal distribution) with some mean ($\mu$) and variance (here represented by standard deviation, or $\sigma$):
+When we fit our model, we obtained an estimate of the error around the mean of each of these parameters, which is stored in the `params.se` object. So instead of thinking of parameters as fixed values, we can think of them as distributions (here, a normal distribution) with some mean $(\mu)$ and variance (here represented by standard deviation, or $\sigma$):
 
 $$\beta_0 \sim {\mathrm Norm}(\mu, \sigma)$$
 
@@ -473,9 +477,9 @@ Plot each of the parameter distributions you have created. For an example of wha
 ```
 
 **Question 3**
-Adjust the forecasting for-loop to incorporate parameter uncertainty into your forecasts. Edit the code below where you see "INSERT YOUR CODE HERE".
+Adjust the forecasting for-loop to incorporate parameter uncertainty into your forecasts. Edit the code below where you see "INSERT YOUR CODE HERE". Your forecast ensemble should have 30 members.
 
-**HINT** Similar to how we used each of the 30 NOAA GEFS ensemble members to generate 30 slightly different forecasts that made up an ensemble with driver uncertainty, you will need to use slightly different parameter values to generate multiple forecasts that together, make up an ensemble incorporating parameter uncertainty. So here, each of your water temperature forecast ensemble members will use the **same** NOAA forecast (choose one member of the NOAA air temperature forecast ensemble to use) but will have **different** parameter values drawn from your parameter distributions. This allows us to quantify how much uncertainty is coming from our model parameters while holding all other sources of uncertainty constant. Your forecast ensemble should have 30 members.
+**HINT** Similar to how we used each of the 30 NOAA GEFS ensemble members to generate 30 slightly different forecasts that made up an ensemble with driver uncertainty, you will need to use slightly different parameter values to generate multiple forecasts that together, make up an ensemble incorporating parameter uncertainty. So here, each of your water temperature forecast ensemble members will use the **same** NOAA forecast (choose one member of the NOAA air temperature forecast ensemble to use) but will have **different** parameter values drawn from your parameter distributions. This allows us to quantify how much uncertainty is coming from our model parameters while holding all other sources of uncertainty constant. 
 
 **Answer 3**
 ```{r}
@@ -642,7 +646,7 @@ df.ic <- data.frame(Date = seq.Date(from = as.Date(fc_date), length.out = 8, by 
 
 
 ```
-###9. Generate a forecast incorporating all sources of uncertainty
+### 9. Generate a forecast incorporating all sources of uncertainty
 To plot a forecast with all sources of uncertainty incorporated, we need to generate a forecast that incorporates driver, parameter, process, and initial conditions uncertainty.
 
 **Question 8** Adjust the forecasting for-loop to incorporate all four sources of uncertainty (driver, parameter, process, initial conditions) into your forecasts. Edit the code below where you see "INSERT YOUR CODE HERE". Your forecast ensemble should have 30 members.
@@ -682,10 +686,10 @@ p11 <- ggplot() +
 # Render plot - this should resemble the water temperature forecast plot in the R Shiny app, Activity C Objective 10 ("Both" model)
 p11
 ```
-###10. Partition uncertainty to see the contribution of each of the four uncertainty types
+### 10. Partition uncertainty 
 If you have successfully calculated and saved the standard deviation from each of your forecasts incorporating a single source of forecast uncertainty above, you should be able to run the following code to see the relative contributions of each source of uncertainty to total forecast uncertainty.
 
-**HINT** This code chunk requires there to be an object in your environment called `df.ic`, which you generated as part of the answer to Question 7. `df.ic` should contain the standard deviations of your forecast with initial conditions uncertainty and should follow a specific format described in Question 7. If you get an error, double-check that you have correctly build and saved `df.ic`.
+**HINT** This code chunk requires there to be an object in your environment called `df.ic`, which you generated as part of the answer to Question 7. `df.ic` should contain the standard deviations of your forecast with initial conditions uncertainty and should follow a specific format described in Question 7. If you get an error, double-check that you have correctly built and saved `df.ic`.
 ```{r}
 # Quantify uncertainty
 
@@ -710,7 +714,7 @@ p12 <- ggplot() +
 # Render plot - this should resemble the uncertainty quantification plot in the R Shiny app, Activity C, Objective 10 ("Both" model)
 p12
 ```
-**Question 9 Optional Exercise** Parameter uncertainty is a substantial source of uncertainty to our forecast. To constrain our forecast uncertainty and potentially improve our forecast, we could try to reduce the uncertainty around our parameters by collecting more environmental data. However, before we do this, we might want to know **which** parameter is contributing the most to parameter uncertainty. Below, develop code that partitions the contribution of **each individual parameter** to parameter uncertainty, and plot their relative contributions. Which parameter should we focus on improving estimates of to reduce total forecast uncertainty?
+**Question 9 Optional Exercise** Parameter uncertainty is a substantial source of uncertainty in our forecast. To constrain our forecast uncertainty and potentially improve our forecast, we could try to reduce the uncertainty around our parameters by collecting more environmental data and improving the fit of our linear regression model. However, before we do this, we might want to know **which** parameter is contributing the most to parameter uncertainty. Below, develop code that partitions the contribution of **each individual parameter** to parameter uncertainty, and plot their relative contributions. Which parameter should we focus on improving estimates of to reduce total forecast uncertainty?
 
 **Answer 9**
 ```{r}
