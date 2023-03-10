@@ -417,17 +417,32 @@ p10 <- ggplot() +
 
 # Render plot - this should resemble the water temperature forecast plot in the R Shiny app, Activity B Objective 9 ("Both" model)
 p10
+
+# Calculate standard deviation of forecast to quantify uncertainty later
+std.driv <- apply(mat, 1, sd)
+df.driv <- data.frame(Date = seq.Date(from = as.Date(fc_date), 
+                                      length.out = 8, by = 1),
+                       sd = std.driv, label = "Driver")
 ```
 ### 6. Generate forecast with parameter uncertainty
 **Parameter uncertainty** refers to the uncertainty in the model parameter values, which can be due to uncertainties in the data or the calibration process used.
 
-With traditional modelling efforts, people general find one set of the 'best fit' parameters and use them to predict with their model. This method does not account for the uncertainty around the estimation of these parameters.
+With traditional modelling efforts, people general find one set of the 'best fit' parameters and use them to predict with their model. 
+
+This method does not account for the uncertainty around the estimation of these parameters.  
 
 There is often the possibility that different parameter sets can yield similar metrics of model performance, e.g., similar R-squared values.
 
 Using parameter distributions allows for a better representation of the potential predicted outcomes, leading to better quantification of the uncertainty.  
   
 Here, you will use the standard errors of the parameters we estimated to generate distributions around each model parameter. You will then generate water temperature forecasts using these parameter distributions to incorporate parameter uncertainty into your water temperature forecasts.
+
+Our model has three parameters: $/beta_0$, the intercept of the linear regression, $/beta_1$, the coefficient on tomorrow's air temperature, and $\beta_2$, the coefficient on today's water temperature. 
+
+$$WaterTemp_{t+1} = \beta_0 + \beta_1*AirTemp_{t+1} + \beta_2*WaterTemp_t$$
+When we fit our model, we obtained an estimate of the error around the mean of each of these parameters, which is stored in the `params.se` object. So instead of thinking of parameters as fixed values, we can think of them as distributions (here, a normal distribution) with some mean ($\mu$) and variance (here represented by standard deviation, or $\sigma$):
+
+$$\beta_0 \sim {\mathrm Norm}(\mu, \sigma)$$
 
 **Question 1**
 
@@ -458,9 +473,9 @@ Plot each of the parameter distributions you have created. For an example of wha
 ```
 
 **Question 3**
-Adjust the forecasting for-loop to incorporate BOTH driver uncertainty and parameter uncertainty into your forecasts. Edit the code below where you see "INSERT YOUR CODE HERE".
+Adjust the forecasting for-loop to incorporate parameter uncertainty into your forecasts. Edit the code below where you see "INSERT YOUR CODE HERE".
 
-**HINT** Similar to how we used each of the 30 NOAA GEFS ensemble members to generate 30 slightly different forecasts that made up an ensemble with driver uncertainty, you will need to use slightly different parameter values to generate multiple forecasts that together, make up an ensemble incorporating parameter uncertainty.
+**HINT** Similar to how we used each of the 30 NOAA GEFS ensemble members to generate 30 slightly different forecasts that made up an ensemble with driver uncertainty, you will need to use slightly different parameter values to generate multiple forecasts that together, make up an ensemble incorporating parameter uncertainty. So here, each of your water temperature forecast ensemble members will use the **same** NOAA forecast (choose one member of the NOAA air temperature forecast ensemble to use) but will have **different** parameter values drawn from your parameter distributions. This allows us to quantify how much uncertainty is coming from our model parameters while holding all other sources of uncertainty constant. Your forecast ensemble should have 30 members.
 
 **Answer 3**
 ```{r}
@@ -468,7 +483,7 @@ Adjust the forecasting for-loop to incorporate BOTH driver uncertainty and param
 mat <- matrix(NA, 8, 30) #8 rows for today + 7 forecast days, 30 columns for 30 NOAA ensemble members
 mat[1, ] <- lake_df$wtemp[which(lake_df$Date == fc_date)]
 
-# Run forecast. Here, instead of looping through days into the future, we are looping through ensemble members and indexing the previous row in the matrix when we need to grab the previous water temperature. We are also drawing from our parameter distributions so each ensemble member is using slightly different parameters.
+# Run forecast. Here, instead of looping through days into the future, we are looping through ensemble members and indexing the previous row in the matrix when we need to grab the previous water temperature. In this case, each ensemble member should use the same NOAA forecast, but we are drawing from our parameter distributions so each ensemble member is using slightly different parameters.
 for(mem in 2:nrow(mat)) {
   #INSERT YOUR CODE HERE
 }
@@ -499,10 +514,30 @@ p7
 
 # Calculate standard deviation of forecast to quantify uncertainty later
 std.param <- apply(mat, 1, sd)
-df.param <- data.frame(Date = seq.Date(from = as.Date(fc_date), length.out = 8, by = 1),
+df.param <- data.frame(Date = seq.Date(from = as.Date(fc_date), 
+                                       length.out = 8, by = 1),
                       sd = std.param, label = "Parameter")
 ```
 ### 7. Generate forecasts with process uncertainty
+**Process uncertainty** is uncertainty caused by our inability to model all processes as observed in the real world.
+
+Our "simple" water temperature model uses today's water temperature and tomorrow's forecasted air temperature to forecast tomorrow's water temperature. 
+  
+$$WaterTemp_{t+1} = \beta_0 + \beta_1*AirTemp_{t+1} + \beta_2*WaterTemp_t$$
+
+But we know that water temperature can be affected by other processes as well (such as rain, inflow streams to a lake, or water column mixing, to name a few) and that our model has simplified or ignored these. To account for the uncertainty these simplifications introduce to our model, we can add in process noise (W) to our model at each time step. In this model, water temperature tomorrow is equal to water temperature today plus air temperature tomorrow plus some noise (W),
+
+$$WaterTemp_{t+1} = \beta_0 + \beta_1*AirTemp_{t+1} + \beta_2*WaterTemp_t + W$$
+where process noise is equal to a random number drawn from a normal distribution with a mean of zero and a standard deviation ($\sigma$).
+
+$$W \sim {\mathrm Norm}(0, \sigma)$$
+To account for process uncertainty, we can run the model multiple times with random noise added to each model run. More noise is associated with high process uncertainty, and vice versa.  
+
+**Question 4** Adjust the forecasting for-loop to incorporate process uncertainty into your forecasts. Edit the code below where you see "INSERT YOUR CODE HERE". Your forecast ensemble should have 30 members.
+
+**HINT** Remember, we want to isolate the effect of process uncertainty on our forecast so we can quantify it. You should be sure to **only** incorporate process uncertainty below (i.e., driver data and parameter values should be constant across all ensemble members).
+
+**Answer 4**
 ```{r}
 #6. Run forecast with process uncertainty ----
 
@@ -513,11 +548,9 @@ proc_unc <- 0.2 # Process Uncertainty Noise Std Dev.
 mat <- matrix(NA, 8, 30) #8 rows for today + 7 forecast days, 30 columns for 30 NOAA ensemble members
 mat[1, ] <- lake_df$wtemp[which(lake_df$Date == fc_date)]
 
-# Run forecast. Here, instead of looping through days into the future, we are looping through
-# ensemble members and indexing the previous row in the matrix when we need to grab the previous
-# water temperature. We are also adding process uncertainty to each ensemble member prediction.
+# Run forecast. Here, instead of looping through days into the future, we are looping through ensemble members and indexing the previous row in the matrix when we need to grab the previous water temperature. We are also adding process uncertainty to each ensemble member prediction.
 for(mem in 2:nrow(mat)) {
-  mat[mem, ] <- mem01$value[mem-1] * coeffs[2] + mat[mem-1, ] * coeffs[3] + coeffs[1] + rnorm(30, 0, proc_unc)
+  #INSERT YOUR CODE HERE
 }
 
 # Data wrangling to get our ensemble forecast ready for plotting
@@ -547,100 +580,82 @@ p5
 
 # Calculate standard deviation of forecast to quantify uncertainty later
 std.proc <- apply(mat, 1, sd)
-df.proc <- data.frame(Date = seq.Date(from = as.Date(fc_date), length.out = 8, by = 1),
+df.proc <- data.frame(Date = seq.Date(from = as.Date(fc_date), 
+                                      length.out = 8, by = 1),
                   sd = std.proc, label = "Process")
+```
+### 8. Generate forecasts with initial conditions uncertainty
+Initial conditions uncertainty refers to uncertainty arising because the initial conditions are not precisely known or because the calculations cannot be performed with the precise initial conditions.
 
+Even though we have measurements of water temperature from our lake, we know that water temperature varies throughout the day so this measurement might not capture exactly the temperature in our lake at this time. Additionally, there may be observation error in our temperature measurements.
 
-#8. Run forecast with initial conditions uncertainty ----
+To account for initial condition uncertainty we can generate a distribution around the initial condition and then run our model with slightly different initial conditions to account for this uncertainty.
 
-# Generate initial conditions distribution 
+The following questions guide you through the process of quantifying initial conditions uncertainty.
+
+**Question 5** Generate a distribution of initial conditions for your forecast using the current water temperature (`curr_wt`) and a standard deviation of 0.1 degrees Celsius (`ic_uc`).
+
+**Answer 5**
+```{r}
+# Generate an initial conditions distribution 
 curr_wt <- forecast_df[which(forecast_df$Date == fc_date),"wtemp"]
 ic_uc <- 0.1 
-ic_dist.df <- data.frame(value = rnorm(1000, curr_wt, ic_uc))
 
-# Plot initial conditions distribution
-# Set plot window limits
-xlims <- c(curr_wt -1.5, curr_wt + 1.5)
-ylims <- c(0,7)
+#INSERT YOUR CODE HERE
+```
 
-#Build plot
-p8 <- ggplot() +
-  # geom_vline(data = df, aes(xintercept = x, color = label)) +
-  geom_vline(xintercept = curr_wt) +
-  geom_density(data = ic_dist.df, aes(value), fill = l.cols[2], alpha = 0.3) +
-  xlab("Temperature (\u00B0C)") +
-  ylab("Density") +
-  coord_cartesian(xlim = xlims, ylim = ylims) +
-  theme_bw(base_size = 18)
+**Question 6** Plot the distribution around your initial condition.
 
-# Render plot - this should resemble the initial condition distribution plot in the R Shiny app, 
-# Activity B Objective 8 ("Both" model)
-p8
+**Answer 6**
+```{r}
 
-# Randomly sample 30 values to use for our forecast
-ic_samp <- sample(ic_dist.df$value, 30, replace = TRUE)
+```
+
+**Question 7** Generate a forecast that incorporates initial conditions uncertainty only, holding all other sources of uncertainty (driver, parameter, process) constant. Your ensemble should have 30 members, with each member having a slightly different initial conditions value. Be sure to both plot the forecast and save the standard deviation of the forecast to quantify initial conditions uncertainty. 
+
+**HINT** Use code provided above as a starting point!
+
+**Answer 7**
+```{r}
+# Randomly sample 30 values from our initial conditions distribution to use for our forecast
+
 
 # Setting up an empty matrix that we will fill with our water temperature predictions
-mat <- matrix(NA, 8, 30) #8 rows for today + 7 forecast days, 30 columns for 30 NOAA ensemble members
-mat[1, ] <- ic_samp
 
-# Run forecast. Here, instead of looping through days into the future, we are looping through
-# ensemble members and indexing the previous row in the matrix when we need to grab the previous
-# water temperature. We are also drawing from our initial condition distribution so each ensemble member
-# is using a slightly different initial condition.
-for(mem in 2:nrow(mat)) {
-  mat[mem, ] <- mem01$value[mem-1] * coeffs[2] + mat[mem-1, ] * coeffs[3] + coeffs[1] 
-}
+# Fill the first row of the matrix (with dimensions 1x30) with the 30 values you randomly sampled from your initial conditions distribution
+
+
+# Run forecast. 
+
 
 # Data wrangling to get our ensemble forecast ready for plotting
-fc_ens <- as.data.frame(mat)
-colnames(fc_ens) <- colnames(wid[,3:32])
-fc_ens$Forecast_date <- seq.Date(from = as.Date(fc_date), length.out = 8, by = 1)
-fc_df <- reshape::melt(fc_ens, id.vars = "Forecast_date")
-colnames(fc_df)[2] <- "Ensemble_member" 
-fc_df$Forecast_variable <- "water temperature"
 
-# Build plot
-p9 <- ggplot() +
-  geom_point(data = lake_obs, aes(Date, wtemp, color = "Observed water temp.")) +
-  geom_line(data = fc_df, aes(Forecast_date, value, color = "Forecasted water temp.", group = Ensemble_member), alpha = 0.6) +
-  geom_vline(xintercept = as.Date(fc_date), linetype = "dashed") +
-  ylab("Temperature (\u00B0C)") +
-  theme_bw(base_size = 12) +
-  scale_color_manual(values = c("Forecasted water temp." = cols[6],"Observed water temp." = cols[2]),
-                     name = "",
-                     guide = guide_legend(override.aes = list(
-                       linetype = c("solid","blank"),
-                       shape = c(NA, 16))))
 
-# Render plot - this should resemble the water temperature forecast plot in the R Shiny app, 
-# Activity B Objective 8 ("Both" model)
-p9
+# Build and render plot
 
-# Calculate standard deviation of forecast to quantify uncertainty later
-std.ic <- apply(mat, 1, sd)
+
+# Calculate the standard deviation of each day of the forecast to quantify initial conditions uncertainty - we will use this information in the next section. Your final output should be a data frame with the following structure:
 df.ic <- data.frame(Date = seq.Date(from = as.Date(fc_date), length.out = 8, by = 1),
                        sd = std.ic, label = "Initial Condition")
+#where std.ic is a vector of 8 values, where each value is the standard deviation of the ensemble forecast from today through 7 days into the future.
 
 
 
-# Calculate standard deviation of forecast to quantify uncertainty later
-std.driv <- apply(mat, 1, sd)
-df.driv <- data.frame(Date = seq.Date(from = as.Date(fc_date), length.out = 8, by = 1),
-                       sd = std.driv, label = "Driver")
+```
+###9. Generate a forecast incorporating all sources of uncertainty
+To plot a forecast with all sources of uncertainty incorporated, we need to generate a forecast that incorporates driver, parameter, process, and initial conditions uncertainty.
 
-#10. Run forecast with all uncertainties -----------
-
+**Question 8** Adjust the forecasting for-loop to incorporate all four sources of uncertainty (driver, parameter, process, initial conditions) into your forecasts. Edit the code below where you see "INSERT YOUR CODE HERE". Your forecast ensemble should have 30 members.
+```{r}
 # Setting up an empty matrix that we will fill with our water temperature predictions
 mat <- matrix(NA, 8, 30) #8 rows for today + 7 forecast days, 30 columns for 30 NOAA ensemble members
-mat[1, ] <- ic_samp #Notice that we are drawing from our initial condition distribution
 
-# Run forecast. Here, we add process uncertainty, use different values of parameters and
-# initial conditions for each ensemble member, and use a different NOAA ensemble member to
-# drive each of our water temperature forecast ensemble members. So we are incorporating
-# four different possible sources of uncertainty.
+# Fill the first row of the matrix (with dimensions 1x30) with the 30 values you randomly sampled from your initial conditions distribution
+mat[1, ] <- #INSERT YOUR CODE HERE
+
+# Run forecast. Here, we add process uncertainty, use different values of parameters and initial conditions for each ensemble member, and use a different NOAA ensemble member to drive each of our water temperature forecast ensemble members. So we are incorporating four different possible sources of uncertainty.
 for(mem in 2:nrow(mat)) {
-  mat[mem, ] <- driv_mat[mem, ] * param.df$beta2 + mat[mem-1, ] * param.df$beta3 + param.df$beta1 + rnorm(30, 0, proc_unc)
+  #INSERT YOUR CODE HERE
 }
 
 # Data wrangling to get our ensemble forecast ready for plotting
@@ -664,10 +679,14 @@ p11 <- ggplot() +
                        linetype = c("solid","blank"),
                        shape = c(NA, 16))))
 
-# Render plot - this should resemble the water temperature forecast plot in the R Shiny app, 
-# Activity C Objective 10 ("Both" model)
+# Render plot - this should resemble the water temperature forecast plot in the R Shiny app, Activity C Objective 10 ("Both" model)
 p11
+```
+###10. Partition uncertainty to see the contribution of each of the four uncertainty types
+If you have successfully calculated and saved the standard deviation from each of your forecasts incorporating a single source of forecast uncertainty above, you should be able to run the following code to see the relative contributions of each source of uncertainty to total forecast uncertainty.
 
+**HINT** This code chunk requires there to be an object in your environment called `df.ic`, which you generated as part of the answer to Question 7. `df.ic` should contain the standard deviations of your forecast with initial conditions uncertainty and should follow a specific format described in Question 7. If you get an error, double-check that you have correctly build and saved `df.ic`.
+```{r}
 # Quantify uncertainty
 
 # Create a data frame that combines all our calculations of the contributions of
@@ -688,10 +707,14 @@ p12 <- ggplot() +
   labs(fill = "Uncertainty") +
   theme_bw(base_size = 12)
 
-# Render plot - this should resemble the uncertainty quantification plot in the R Shiny
-# app, Activity C, Objective 10 ("Both" model)
+# Render plot - this should resemble the uncertainty quantification plot in the R Shiny app, Activity C, Objective 10 ("Both" model)
 p12
+```
+**Question 9 Optional Exercise** Parameter uncertainty is a substantial source of uncertainty to our forecast. To constrain our forecast uncertainty and potentially improve our forecast, we could try to reduce the uncertainty around our parameters by collecting more environmental data. However, before we do this, we might want to know **which** parameter is contributing the most to parameter uncertainty. Below, develop code that partitions the contribution of **each individual parameter** to parameter uncertainty, and plot their relative contributions. Which parameter should we focus on improving estimates of to reduce total forecast uncertainty?
 
-# Congratulations! You have quantified all the uncertainty. Now, have a nap :-)
+**Answer 9**
+```{r}
+
 ```
 
+Congratulations! You have quantified all the uncertainty. Now, have a nap. :-)
