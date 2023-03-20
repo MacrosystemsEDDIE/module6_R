@@ -101,7 +101,7 @@ out <- lapply(fc_date, function(dat) {
     mlt1 <- reshape::melt(var_list, id.vars = "time")
     mlt1 <- mlt1[, c("time", "L1", "value")]
     
-    cnam <- paste0("mem", formatC(i, width = 2, format = "d", flag = "0"))
+    cnam <- i
     if(i == 1) {
       df2 <- mlt1
       colnames(df2)[3] <- cnam
