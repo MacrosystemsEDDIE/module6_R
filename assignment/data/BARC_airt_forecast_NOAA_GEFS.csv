@@ -1,4 +1,4 @@
-"Forecast_date","Forecast_variable","Ensemble_member","value"
+"forecast_date","forecast_variable","ensemble_member","value"
 2020-09-25,"air_temperature",1,27.0058202107748
 2020-09-25,"air_temperature",2,27.2549593607585
 2020-09-25,"air_temperature",3,27.8966016133627
