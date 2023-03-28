@@ -200,7 +200,7 @@ plot_airtemp_forecast(lake_obs, noaa_fc)
 **Answer Q.6**
   
   
-## 3. Build a multiple linear regression forecast model 
+## 3. Build a linear regression forecast model 
 
 We will use observed water temperature and air temperature data to build a linear regression model to predict water temperature.  
   
@@ -236,17 +236,10 @@ A parameter distribution shows the possible values for a parameter value and how
 
 ### Fitting model
 
-First, build data frame to fit model. We will create a column `wtemp_yday` which is a column of 1-day lags of water temperature.
+Fit a linear regression model using today's air temperature to predict today's water temperature.
 
 ```{r}
-model_data <- lake_df %>%
-  mutate(wtemp_yday = lag(wtemp))
-```
-
-Fit a multiple linear regression model using both yesterday's water temperature and today's air temperature.
-
-```{r}
-fit <- lm(model_data$wtemp ~ model_data$airt + model_data$wtemp_yday)
+fit <- lm(lake_df$wtemp ~ lake_df$airt)
 fit.summ <- summary(fit)
 ```
 
@@ -267,15 +260,15 @@ params.se
 Calculate model predictions.
 
 ```{r}
-mod <- predict(fit, model_data)
+mod <- predict(fit, lake_df)
 ```
 
 Assess model fit by calculating $R^2$, (`r2`), mean bias (`err`), and RMSE (`RMSE`).
 
 ```{r}
 r2 <- round(fit.summ$r.squared, 2) 
-err <- mean(mod - model_data$wtemp, na.rm = TRUE) 
-rmse <- round(sqrt(mean((mod - model_data$wtemp)^2, na.rm = TRUE)), 2) 
+err <- mean(mod - lake_df$wtemp, na.rm = TRUE) 
+rmse <- round(sqrt(mean((mod - lake_df$wtemp)^2, na.rm = TRUE)), 2) 
 ```
 
 Prepare data frames for plotting.
@@ -284,23 +277,23 @@ Prepare data frames for plotting.
 lake_df2 <- lake_df %>%
   filter(date > "2020-01-01")
   
-pred <- tibble(date = model_data$date,
+pred <- tibble(date = lake_df$date,
                model = mod) %>%
   filter(date > "2020-01-01")
 ```
 
-Build plot of modeled and observed water temperature. This should match the plot you see in the Shiny app Activity A, Objective 5 - Improve Model for Forecasting IF you selected Lake Barco as your site.
+Build plot of modeled and observed water temperature. This should match the plot you see in the Shiny app Activity A, Objective 3 - Build a water temperature model IF you selected Lake Barco as your site.
 
 ```{r}
 mod_predictions_watertemp(lake_df2, pred)
 ```
 
-**Q.7 (Rmd)** Describe the structure of the multiple linear regression model in your own words. How is water temperature being predicted?  
+**Q.7 (Rmd)** Describe the structure of the linear regression model in your own words. How is water temperature being predicted?  
   
 **Answer Q.7**
   
   
-**Q.8 (Rmd)** Examine the values of the fitted model parameters (`coeffs`). What does this tell you about the relative importance of past water temperature and current air temperature in driving current water temperature? Examine the standard errors of the parameters (`params.se`). What do the standard errors tell you about how confident we are in the fitted model parameter values?
+**Q.8 (Rmd)** Examine the values of the fitted model parameters (`coeffs`). What does this tell you about the importance of current air temperature in driving current water temperature? Examine the standard errors of the parameters (`params.se`). What do the standard errors tell you about how confident we are in the fitted model parameter values?
   
 **Answer Q.8**
   
@@ -359,12 +352,8 @@ for(d in 2:length(fc_dates)) {
     temp_driv <- noaa_fc %>%
       filter(forecast_date == fc_dates[d] & ensemble_member == 1)
     
-  #pull lagged water temp values
-    temp_lag <- forecast_deterministic %>%
-      filter(forecast_date == fc_dates[d-1])
-    
   #run model
-    temp_pred$value <- temp_driv$value * coeffs[2] + temp_lag$value * coeffs[3] + coeffs[1]
+    temp_pred$value <- temp_driv$value * coeffs[2] + coeffs[1]
     
   #insert values back into forecast dataframe
     forecast_deterministic <- forecast_deterministic %>%
@@ -372,7 +361,7 @@ for(d in 2:length(fc_dates)) {
 }
 ```
 
-Build plot. This should resemble the plot in the R Shiny app Activity B Overview, labeled "Water Temperature Forecast"; here, we are plotting the "Both" model, which uses both yesterday's water temperature and today's forecasted air temperature to forecast water temperature
+Build plot. This should resemble the plot in the R Shiny app Activity B Overview, labeled "Water Temperature Forecast"; here, we are plotting the "Atemp" model, which uses both today's forecasted air temperature to forecast water temperature
 
 ```{r}
 plot_forecast(lake_obs, 
@@ -428,12 +417,8 @@ for(d in 2:length(fc_dates)) {
     temp_driv <- noaa_fc %>%
       filter(forecast_date == fc_dates[d])
     
-  #pull lagged water temp values
-    temp_lag <- forecast_driver_unc %>%
-      filter(forecast_date == fc_dates[d-1])
-    
   #run model
-    temp_pred$value <- temp_driv$value * coeffs[2] + temp_lag$value * coeffs[3] + coeffs[1]
+    temp_pred$value <- temp_driv$value * coeffs[2] + coeffs[1]
     
   #insert values back into forecast dataframe
     forecast_driver_unc <- forecast_driver_unc %>%
@@ -441,7 +426,7 @@ for(d in 2:length(fc_dates)) {
 }
 ```
 
-Build plot - this should resemble the water temperature forecast plot in the R Shiny app, Activity B Objective 9 ("Both" model)
+Build plot - this should resemble the water temperature forecast plot in the R Shiny app, Activity B Objective 9 ("Atemp" model)
 
 ```{r}
 plot_forecast(lake_obs, 
@@ -482,14 +467,14 @@ Using parameter distributions allows for a better representation of the potentia
   
 Here, you will use the standard errors of the parameters we estimated to generate distributions around each model parameter. You will then use these parameter distributions to incorporate parameter uncertainty into your water temperature forecasts.
 
-Our model has three parameters: $\beta_0$, the intercept of the linear regression, $\beta_1$, the coefficient on tomorrow's air temperature, and $\beta_2$, the coefficient on today's water temperature. 
+Our model has two parameters: $\beta_1$, the intercept of the linear regression, and $\beta_2$, the coefficient on tomorrow's air temperature. 
 
-$$WaterTemp_{t+1} = \beta_0 + \beta_1*AirTemp_{t+1} + \beta_2*WaterTemp_t$$
+$$WaterTemp_{t+1} = \beta_1 + \beta_2*AirTemp_{t+1}$$
 When we fit our model, we obtained an estimate of the error around the mean of each of these parameters, which is stored in the `params.se` object. So instead of thinking of parameters as fixed values, we can think of them as distributions (here, a normal distribution) with some mean $(\mu)$ and variance (here represented by standard deviation, or $\sigma$):
 
-$$\beta_0 \sim {\mathrm Norm}(\mu, \sigma)$$
+$$\beta_1 \sim {\mathrm Norm}(\mu, \sigma)$$
 
-Now, we will generate parameter distributions based on parameter estimates for the multiple linear regression model.  
+Now, we will generate parameter distributions based on parameter estimates for the linear regression model.  
   
 **HINT** Examine the `coeffs` and `params.se` objects we created when we fit the multiple regression model above. Think about what information they contain and how you might use that information to generate a **parameter distribution**.
 ```{r}
@@ -519,8 +504,7 @@ Use the `rnorm()` function and the information in the `coeffs` and `params.se` o
 
 ```{r}
 param.df <- data.frame(beta1 = rnorm(30, coeffs[1], params.se[1]),
-                 beta2 = rnorm(30, coeffs[2], params.se[2]),
-                 beta3 = rnorm(30, coeffs[3], params.se[3]))
+                 beta2 = rnorm(30, coeffs[2], params.se[2]))
 ```
 
 Plot each of the parameter distributions you have created. 
@@ -561,12 +545,8 @@ for(d in 2:length(fc_dates)) {
     temp_driv <- noaa_fc %>%
       filter(forecast_date == fc_dates[d] & ensemble_member == 1)
     
-  #pull lagged water temp values
-    temp_lag <- forecast_parameter_unc %>%
-      filter(forecast_date == fc_dates[d-1])
-    
   #run model using parameter distributions instead of fixed values
-    temp_pred$value <- temp_driv$value * param.df$beta2 + temp_lag$value * param.df$beta3 + param.df$beta1
+    temp_pred$value <- temp_driv$value * param.df$beta2 + param.df$beta1
     
   #insert values back into forecast dataframe
     forecast_parameter_unc <- forecast_parameter_unc %>%
@@ -574,7 +554,7 @@ for(d in 2:length(fc_dates)) {
 }
 ```
 
-Build plot - this should resemble the water temperature forecast plot in the R Shiny app, Activity B Objective 7 ("Both" model)
+Build plot - this should resemble the water temperature forecast plot in the R Shiny app, Activity B Objective 7 ("Atemp" model)
 
 ```{r}
 plot_forecast(lake_obs, 
@@ -593,13 +573,13 @@ plot_forecast(lake_obs,
 
 **Process uncertainty** is uncertainty caused by our inability to model all processes as observed in the real world.
 
-Our "simple" water temperature model uses today's water temperature and tomorrow's forecasted air temperature to forecast tomorrow's water temperature. 
+Our "simple" water temperature model uses tomorrow's forecasted air temperature to forecast tomorrow's water temperature. 
   
-$$WaterTemp_{t+1} = \beta_0 + \beta_1*AirTemp_{t+1} + \beta_2*WaterTemp_t$$
+$$WaterTemp_{t+1} = \beta_1 + \beta_2*AirTemp_{t+1}$$
 
-But we know that water temperature can be affected by other processes as well (such as rain, inflow streams to a lake, or water column mixing, to name a few) and that our model has simplified or ignored these. To account for the uncertainty these simplifications introduce to our model, we can add in process noise (W) to our model at each time step. In this model, water temperature tomorrow is equal to water temperature today plus air temperature tomorrow plus some noise (W),
+But we know that water temperature can be affected by other processes as well (such as rain, inflow streams to a lake, or water column mixing, to name a few) and that our model has simplified or ignored these. To account for the uncertainty these simplifications introduce to our model, we can add in process noise (W) to our model at each time step. In this model, water temperature tomorrow is equal to air temperature tomorrow plus some noise (W),
 
-$$WaterTemp_{t+1} = \beta_0 + \beta_1*AirTemp_{t+1} + \beta_2*WaterTemp_t + W$$
+$$WaterTemp_{t+1} = \beta_1 + \beta_2*AirTemp_{t+1} + W$$
 where process noise is equal to a random number drawn from a normal distribution with a mean of zero and a standard deviation ($\sigma$).
 
 $$W \sim {\mathrm Norm}(0, \sigma)$$
@@ -640,12 +620,8 @@ for(d in 2:length(fc_dates)) {
     temp_driv <- noaa_fc %>%
       filter(forecast_date == fc_dates[d] & ensemble_member == 1)
     
-  #pull lagged water temp values
-    temp_lag <- forecast_parameter_unc %>%
-      filter(forecast_date == fc_dates[d-1])
-    
   #run model using parameter distributions instead of fixed values
-    temp_pred$value <- temp_driv$value * coeffs[2] + temp_lag$value * coeffs[3] + coeffs[1] + rnorm(n = 30, mean = 0, sd = sigma)
+    temp_pred$value <- temp_driv$value * coeffs[2] + coeffs[1] + rnorm(n = 30, mean = 0, sd = sigma)
     
   #insert values back into forecast dataframe
     forecast_process_unc <- forecast_process_unc %>%
@@ -653,7 +629,7 @@ for(d in 2:length(fc_dates)) {
 }
 ```
 
-Build plot - this should resemble the water temperature forecast plot in the R Shiny app, Activity B Objective 6 ("Both" model)
+Build plot - this should resemble the water temperature forecast plot in the R Shiny app, Activity B Objective 6 ("Atemp" model)
 
 ```{r}
 plot_forecast(lake_obs, 
@@ -670,15 +646,13 @@ Even though we have measurements of water temperature from our lake, we know tha
 
 To account for initial condition uncertainty we can generate a distribution around the initial condition and then run our model with slightly different initial conditions to account for this uncertainty.
 
-The following questions guide you through the process of quantifying initial conditions uncertainty.
-
 Generate a distribution of initial conditions for your forecast using the current water temperature (`curr_wt`) and a standard deviation of 0.1 degrees Celsius (`ic_sd`).
 ```{r}
 ic_sd <- 0.1 
 ic_uc <- rnorm(n = 30, mean = curr_wt, sd = ic_sd)
 ```
 
-Plot the distribution around your initial condition. This should resemble the initial condition distribution plot in the R Shiny app, Activity B Objective 8 ("Both" model).
+Plot the distribution around your initial condition. This should resemble the initial condition distribution plot in the R Shiny app, Activity B Objective 8 ("Atemp" model).
 
 ```{r}
 plot_ic_dist(curr_wt, ic_uc)
@@ -722,12 +696,8 @@ for(d in 2:length(fc_dates)) {
     temp_driv <- noaa_fc %>%
       filter(forecast_date == fc_dates[d] & ensemble_member == 1)
     
-  #pull lagged water temp values
-    temp_lag <- forecast_ic_unc %>%
-      filter(forecast_date == fc_dates[d-1])
-    
   #run model using initial conditions distribution instead of a fixed value
-    temp_pred$value <- temp_driv$value * coeffs[2] + temp_lag$value * coeffs[3] + coeffs[1] 
+    temp_pred$value <- temp_driv$value * coeffs[2] + coeffs[1] 
     
   #insert values back into forecast dataframe
     forecast_ic_unc <- forecast_ic_unc %>%
@@ -735,7 +705,7 @@ for(d in 2:length(fc_dates)) {
 }
 ```
 
-Build plot - this should resemble the water temperature forecast plot in the R Shiny app, Activity B Objective 8 ("Both" model)
+Build plot - this should resemble the water temperature forecast plot in the R Shiny app, Activity B Objective 8 ("Atemp" model)
 
 ```{r}
 plot_forecast(lake_obs, 
@@ -788,12 +758,8 @@ for(d in 2:length(fc_dates)) {
     temp_driv <- noaa_fc %>%
       filter(forecast_date == fc_dates[d])
     
-  #pull lagged water temp values
-    temp_lag <- forecast_total_unc %>%
-      filter(forecast_date == fc_dates[d-1])
-    
-  #run model using initial conditions distribution instead of a fixed value
-    temp_pred$value <- temp_driv$value * param.df$beta2 + temp_lag$value * param.df$beta3 + param.df$beta1 + rnorm(n = 30, mean = 0, sd = sigma) 
+  #run model using initial conditions and parameter distributions instead of fixed values, and adding process uncertainty
+    temp_pred$value <- temp_driv$value * param.df$beta2 + param.df$beta1 + rnorm(n = 30, mean = 0, sd = sigma) 
     
   #insert values back into forecast dataframe
     forecast_total_unc <- forecast_total_unc %>%
@@ -801,7 +767,7 @@ for(d in 2:length(fc_dates)) {
 }
 ```
 
-Build plot - this should resemble the water temperature forecast plot in the R Shiny app, Activity C Objective 10 ("Both" model)
+Build plot - this should resemble the water temperature forecast plot in the R Shiny app, Activity C Objective 10 ("Atemp" model)
 
 ```{r}
 plot_forecast(lake_obs, 
@@ -830,7 +796,7 @@ sd_df <- all_forecast_df %>%
   ungroup()
 ```
 
-Plot the contribution of each source of uncertainty to total forecast uncertainty. This should resemble the uncertainty quantification plot in the R Shiny app, Activity C, Objective 10 ("Both" model).
+Plot the contribution of each source of uncertainty to total forecast uncertainty. This should resemble the uncertainty quantification plot in the R Shiny app, Activity C, Objective 10 ("Atemp" model).
 
 ```{r}
 plot_partitioned_uc(sd_df)

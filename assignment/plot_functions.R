@@ -58,7 +58,7 @@ plot_forecast <- function(lake_obs, forecast, fc_date, title){
     geom_vline(xintercept = as_date(fc_date), linetype = "dashed") +
     ylab("Temperature (\u00B0C)") +
     theme_bw(base_size = 12) +
-    scale_color_manual(values = c("Forecasted water temp." = cols[4],"Observed water temp." = cols[2]),
+    scale_color_manual(values = c("Forecasted water temp." = cols[1],"Observed water temp." = cols[2]),
                        name = "",
                        guide = guide_legend(override.aes = list(
                          linetype = c("solid","blank"),
