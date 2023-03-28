@@ -65,7 +65,23 @@ Finally, we will put it all together to generate a forecast that incorporates al
 9. Generate a forecast incorporating all sources of uncertainty. 
 10. Partition uncertainty.  
   
-Example code is provided for steps 1-5, and you will be asked several short answer questions to interpret code output. Beginning in step 6, you will be guided to build on the module code by adjusting example code or developing your own code. The coding questions will build in difficulty and the amount of guidance provided will decrease as you progress from step 6 to step 10. Keep in mind that the example code is provided to help you, and use as much of it as you can in completing the questions embedded in steps 6-10. There are a total of 16 questions. Please see the module rubric for possible points per question and confirm with your instructor whether and how the module will be graded.  
+There are a total of 20 questions embedded throughout this module, many of which parallel (and in some cases are identical to) questions in the R Shiny app version of the module. Questions which are identical to those in the Shiny app will be indicated with **(Shiny)**, while questions unique to this RMarkdown will be indicated with **(Rmd)**. Note that question numbers will differ between the RMarkdown and the Shiny app, even if the question text is the same. Please see the module rubric for possible points per question and confirm with your instructor whether and how the module will be graded. 
+
+## Think About It!
+
+**Q.1 (Shiny)**
+What is meant by the term 'uncertainty' in the context of ecological forecasting?
+
+**Answer Q.1**
+
+
+
+**Q.2 (Shiny)**
+How do you think knowing the uncertainty in a forecast helps natural resource managers? For example, if a drinking water manager received a toxic algal bloom forecast with high vs. low uncertainty in a bloom prediction, how might that affect their decision-making?
+
+**Answer Q.2**
+
+
   
 ## Set-up
 
@@ -86,7 +102,17 @@ source("./plot_functions.R")
 
 ## 1. Read in and visualize data from Lake Barco, FL, USA
 
-Lake Barco is one of the lake sites in the U.S. National Ecological Observatory Network (NEON). Please refer to https://www.neonscience.org/field-sites/barc to learn more about this site.  
+Lake Barco is one of the lake sites in the U.S. National Ecological Observatory Network (NEON). Please refer to https://www.neonscience.org/field-sites/barc to learn more about this site.
+
+**Q.3 (Shiny)** Use the website linked above to fill out information about Lake Barco:
+
+**Answer Q.3**
+Four letter site identifier:
+Latitude:
+Longitude:
+Lake area (km2):
+Elevation (m):
+
   
 ### Water Temperature
 
@@ -98,7 +124,14 @@ Freshwater ecosystems are currently experiencing a multitude of stressors such a
   
 Being able to predict how water temperature may change in the short-term (up to 7-days into the future) can provide natural resource managers with critical information to take pro-active actions to prevent degradation of water quality.  
 
-Read in and view lake data
+**Q.4 (Shiny)** List two potential impacts on lakes and inland water bodies as a result of increasing water temperature.
+
+**Answer Q.4**
+
+
+
+
+Read in and view lake data.
 
 ```{r}
 lake_df <- read_csv("data/BARC_airt_wtemp_celsius.csv")
@@ -110,9 +143,9 @@ Build time series plot of air temperature and water temperature.  If you are com
 plot_lake_data(lake_df)
 ```
 
-**Question 1:** Describe observed patterns in air and water temperature at Lake Barco over the course of a year, including the range of observed temperatures and whether and how air and water temperature  appear to relate to each other.  
+**Q.5 (Shiny)** Do you think there is a linear relationship between air temperature and water temperature at this lake? 
   
-**Answer 1:**
+**Answer Q.5**
   
   
 ## 2. Read in and visualize an air temperature forecast for Lake Barco 
@@ -162,9 +195,9 @@ Build plot. This should match the time series plot in Activity B, Objective 9 - 
 plot_airtemp_forecast(lake_obs, noaa_fc)
 ```
 
-**Question 2:** Why are there multiple gray lines on the plot above? What do they represent? Be as specific as you can.  
+**Q.6 (Rmd)** Why are there multiple gray lines on the plot above? What do they represent? Be as specific as you can.  
   
-**Answer 2:**
+**Answer Q.6**
   
   
 ## 3. Build a multiple linear regression forecast model 
@@ -262,19 +295,19 @@ Build plot of modeled and observed water temperature. This should match the plot
 mod_predictions_watertemp(lake_df2, pred)
 ```
 
-**Question 3:** Describe the structure of the multiple linear regression model in your own words. How is water temperature being predicted?  
+**Q.7 (Rmd)** Describe the structure of the multiple linear regression model in your own words. How is water temperature being predicted?  
   
-**Answer 3:**
-  
-  
-**Question 4:** Examine the values of the fitted model parameters (`coeffs`). What does this tell you about the relative importance of past water temperature and current air temperature in driving current water temperature? Examine the standard errors of the parameters (`params.se`). What do the standard errors tell you about how confident we are in the fitted model parameter values?
-  
-**Answer 4:**
+**Answer Q.7**
   
   
-**Question 5:** Assess the model fit. Examine the values of `r2`, `err`, and `rmse`, as well as the plot showing the model fit and observations. What does this tell you about model performance?  
+**Q.8 (Rmd)** Examine the values of the fitted model parameters (`coeffs`). What does this tell you about the relative importance of past water temperature and current air temperature in driving current water temperature? Examine the standard errors of the parameters (`params.se`). What do the standard errors tell you about how confident we are in the fitted model parameter values?
   
-**Answer 5:** 
+**Answer Q.8**
+  
+  
+**Q.9 (Rmd)** Assess the model fit. Examine the values of `r2`, `err`, and `rmse`, as well as the plot showing the model fit and observations. What does this tell you about model performance?  
+  
+**Answer Q.9** 
   
   
 ## 4. Generate a deterministic forecast (without uncertainty)
@@ -348,9 +381,9 @@ plot_forecast(lake_obs,
               title = "Deterministic forecast")
 ```
 
-**Question 6:** Compare the water temperature forecast plot above to the plot of the NOAA GEFS air temperature forecast. Does the forecasted water temperature track the forecasted air temperature, and why might this be?  
+**Q.10 (Rmd)** Compare the water temperature forecast plot above to the plot of the NOAA GEFS air temperature forecast. Does the forecasted water temperature track the forecasted air temperature, and why might this be?  
   
-**Answer 6:** 
+**Answer Q.10** 
   
   
 ### What is wrong with deterministic forecasts?
@@ -417,9 +450,23 @@ plot_forecast(lake_obs,
               title = "Forecast with Driver Uncertainty")
 ```
 
-**Question 7:** Compare the plot above of the probabilistic forecast with driver uncertainty to the plot of the deterministic forecast. How do the differences in these two forecasts affect your understanding of what water temperatures are likely to be during the week of the forecast?  
-**Answer 7:** 
+**Q.11 (Shiny)** How does forecast uncertainty change further into the future?
+
+**Answer Q.11**
+
+
+
+**Q.12 (Rmd)** Compare the plot above of the probabilistic forecast with driver uncertainty to the plot of the deterministic forecast. How do the differences in these two forecasts affect your understanding of what water temperatures are likely to be during the week of the forecast?  
+
+**Answer Q.12** 
   
+  
+**Q.13 (Shiny)** Can you think of a way to reduce driver uncertainty in your forecast of water temperature?
+
+
+**Answer Q.13**
+
+
   
 ## 6. Generate a forecast with parameter uncertainty
 
@@ -535,6 +582,12 @@ plot_forecast(lake_obs,
               fc_date,
               title = "Forecast with Parameter Uncertainty")
 ```
+**Q.14 (Shiny)** Can you think of potential ways to reduce parameter uncertainty?
+
+
+**Answer Q.14**
+
+
 
 ## 7. Generate a forecast with process uncertainty
 
@@ -634,6 +687,7 @@ plot_ic_dist(curr_wt, ic_uc)
 Generate a forecast that incorporates initial conditions uncertainty only, holding all other sources of uncertainty (driver, parameter, process) constant. Our ensemble has 30 members, with each member having a slightly different initial conditions value.
 
 Create dataframe with distribution of initial conditions.
+
 ```{r}
 ic_df <- tibble(forecast_date = rep(as.Date(fc_date), times = n_members),
                 ensemble_member = c(1:n_members),
@@ -689,6 +743,20 @@ plot_forecast(lake_obs,
               fc_date,
               title = "Forecast with Initial Condition Uncertainty")
 ```
+
+**Q.15 (Shiny)** What factors can lead to an increase in initial conditions uncertainty?
+
+
+**Answer Q.15**
+
+
+**Q.16 (Shiny)** What potential steps could be taken to reduce initial conditions uncertainty?
+
+
+**Answer Q.16**
+
+
+
 
 ## 9. Generate a forecast incorporating all sources of uncertainty
 
@@ -767,6 +835,22 @@ Plot the contribution of each source of uncertainty to total forecast uncertaint
 ```{r}
 plot_partitioned_uc(sd_df)
 ```
+**Q.17 (Shiny)** Which source of uncertainty contributes the most to total forecast uncertainty?
+
+**Answer Q.17**
+
+**Q.18 (Shiny)** You have been given $5,000 to improve your water temperature forecasts. What would you spend it on to reduce your forecast uncertainty?
+
+**Answer Q.18** 
+
+**Q.19 (Shiny)** Do you think that different lake sites would have the same or different quantities of uncertainty? Why?
+
+**Answer Q.19**
+
+**Q.20 (Rmd)** Do you think that different water temperature forecast models would have the same or different quantities of uncertainty? Why?
+
+**Answer Q.20**
+
 
 Congratulations! You have quantified all the uncertainty. Now, have a nap. :-)  
   

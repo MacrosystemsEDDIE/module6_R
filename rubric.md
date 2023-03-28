@@ -2,19 +2,11 @@
 
 ## Module weight: 45 pts
 
-- 2 pts per question for Question 1-15 (total of 30 pts)
+- 2 pts per question for Question 1-20 (total of 40 pts)
     - **0pts**: no code or answer provided
     - **1 pt**: Code provided and includes at least one correct step but is not complete AND/OR (if text answer) response present but limited in depth of answer
     - **2 pt**: Correct code provided AND/OR insightful text answer provided that correctly describes patterns or addresses question.
     
-- 10 pts for Question 16 (total of 10 pts)
-    - **0pts**: no code or answer provided
-    - **2 pt**: Code provided and includes at least one correct step but is not complete AND/OR (if text answer) response present but limited in depth of answer
-    - **4 pt**: Code, text, and plots include functions that were introduced in the module but the scientific analysis is not valid.
-    - **6 pt**: Code, text, and plots provides valid scientific analysis of observed trends but limited or incorrect interpretation
-    - **8 pt**: Text provides scientific analysis of observed trends and reflects on implications or hypotheses for those patterns and code uses multiple skills covered in the module
-    - **10 pt**: Code, text, and plots provides an analysis that clearly uses the skills and concepts introduced in the module. Highly insightful analysis that goes beyond the questions provided in the template.
-
 - 3 pts for RMarkdown
     - **0pts**: no .md or plots commited. no changes evident on the Rmarkdown file or formatting in Rmarkdown incorrect (e.g. code outside code blocks, text inside code blocks, etc)
     - **1pts**: evidence of knitting, commiting, and pushing changes to Rmarkdown but knit to an html, pdf, doc, or other not .md output. OR knit only once and .md is totally out of sync with the .Rmd changes.
