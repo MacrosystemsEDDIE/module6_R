@@ -4,4 +4,4 @@
 .Ruserdata
 *.html
 .DS_store
-/module6_files/*
+assignment/module6_files/*
