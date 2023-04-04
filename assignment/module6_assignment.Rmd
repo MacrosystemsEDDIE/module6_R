@@ -15,11 +15,11 @@ This assignment is designed to be completed after students have completed the mo
   
 ## Overview
 
-In this assignment, we will generate forecasts of lake water temperature for 1-7 days into the future using a slightly more complex model than was used in the module6.Rmd. Rather than fitting a linear regression model between air temperature and water temperature, we will fit a multiple linear regression model using both today's water temperature and tomorrow's air temperature as predictors of tomorrow's water temperature. Then, we will explore how the forecast uncertainty of forecasts made using the multiple linear regression model compare to forecasts made using the simple linear regression model. This will involve the following steps:
+In this assignment, you will generate forecasts of lake water temperature for 1-7 days into the future using a slightly more complex model than was used in the module6.Rmd. In addition to using today's water temperature and tomorrow's air temperature as predictors of tomorrow's water temperature, you will choose one or more additional weather variables to add as drivers to your model. Then, you will explore how the forecast uncertainty of forecasts made using the multiple linear regression model compare to forecasts made using the simple linear regression model. This will involve the following steps:
   
 1. Read in and visualize data from Lake Barco, FL, USA. 
-2. Read in and visualize an air temperature forecast for Lake Barco. 
-3. Build a multiple linear regression forecast model. 
+2. Read in and visualize a weather forecast for Lake Barco. 
+3. Build a multiple linear regression forecast model with multiple weather variables as drivers. 
 4. Generate a forecast with driver uncertainty. 
 5. Generate a forecast with parameter uncertainty. 
 6. Generate a forecast with process uncertainty. 
@@ -54,57 +54,58 @@ Lake Barco is one of the lake sites in the U.S. National Ecological Observatory 
 Read in and view lake data.
 
 ```{r}
-lake_df <- read_csv("data/BARC_airt_wtemp_celsius.csv")
+lake_df <- read_csv("data/BARC_lakedata.csv", show_col_types = FALSE)
 ```
 
-Build time series plot of air temperature and water temperature.  
+Build time series plot of lake data.  
 
 ```{r}
-plot_lake_data(lake_df)
+ggplot(data = lake_df, aes(x = Date, y = value))+
+  facet_grid(rows = vars(variable), scales = "free_y")+
+  geom_point()+
+  theme_bw()
 ```
   
   
-## 2. Read in and visualize an air temperature forecast for Lake Barco 
+## 2. Read in and visualize a weather forecast for Lake Barco 
 
-We have obtained an air temperature forecast for Lake Barco from the U.S. National Oceanic and Atmospheric Administration Global Ensemble Forecast System (NOAA GEFS). 
+We have obtained a weather forecast for Lake Barco from the U.S. National Oceanic and Atmospheric Administration Global Ensemble Forecast System (NOAA GEFS). 
 
-Here, we read in NOAA forecast data that has been wrangled into a suitable format for our exercise: a two-dimensional data frame containing a 7-day-ahead air temperature forecast with 30 ensemble members.
+Here, we read in NOAA forecast data that has been wrangled into a suitable format for our exercise: a two-dimensional data frame containing a 7-day-ahead forecast of air temperature, precipitation, wind speed, and shortwave radiation with 30 ensemble members.
 
-Read in and view air temperature forecast.  We will be working with a NOAA forecast generated on 2020-09-25
+Read in and view the weather forecast.  We will be working with a NOAA forecast generated on 2020-09-25
   
 ```{r}
-noaa_fc <- read_csv("./data/BARC_airt_forecast_NOAA_GEFS.csv")
+weather_forecast <- read_csv("./data/BARC_forecast_NOAA_GEFS.csv", show_col_types = FALSE)
 ```
 
-Voila! We now have an object called "noaa_fc" which is a two-dimensional data frame containing a 7-day-ahead NOAA air temperature forecast. Let's look at "noaa_fc".
+Voila! We now have an object called `weather_forecast` which is a two-dimensional data frame containing a 7-day-ahead NOAA air temperature forecast. Let's look at `weather_forecast`.
 
 ```{r}
-head(noaa_fc)
+head(weather_forecast)
 ```
 
-The columns are the following: 
-- forecast_date: this is the date for which temperature is forecasted
-- forecast_variable: this is the variable being forecasted
-- ensemble_member: this is an identifier for each member of the 30-member ensemble
-- value: this is the value of the forecasted variable (in our case, degrees Celsius)
+The columns are the following:   
+- forecast_date: this is the date for which temperature is forecasted.  
+- forecast_variable: this is the variable being forecasted.  
+- ensemble_member: this is an identifier for each member of the 30-member ensemble.  
+- value: this is the value of the forecasted variable.      
+
+The units for the variables are:   
+- air_temperature: degrees Celsius.    
+- precipitation: millimeters per...    
+- wind_speed: meters per second.   
+- surface_radiation: Watts per meter squared.   
 
 Now we will plot the NOAA forecast.
-
-Data wrangling of observed air temperature data at Lake Barco so we can plot observed and forecasted air temperature on one time series plot
-
-```{r}
-fc_date <- "2020-09-25"
-
-lake_obs <- lake_df %>%
-  filter(date >= "2020-09-22" & date <= "2020-10-02") %>%
-  mutate(wtemp = ifelse(date > fc_date, NA, wtemp),
-         airt = ifelse(date > fc_date, NA, airt))
-```
 
 Build plot. 
 
 ```{r}
-plot_airtemp_forecast(lake_obs, noaa_fc)
+ggplot(data = weather_forecast, aes(x = forecast_date, y = value, group = ensemble_member))+
+  facet_grid(rows = vars(variable), scales = "free_y")+
+  geom_line(color = "gray")+
+  theme_bw()
 ```
   
 ## 3. Build a multiple linear regression forecast model 
@@ -113,7 +114,7 @@ We will use observed water temperature and air temperature data to build a multi
 
 ### Fitting model
 
-##add in bit here about why new drivers would be expected to affect water temp; see MS EDDIE Module 1 visualizations for examples; look at powerpoint or bonus slides for powerpoint
+**Add in schematic of how met drivers affect lake temperature.**
 
 First, build data frame to fit model. We will create a column `wtemp_yday` which is a column of 1-day lags of water temperature.
 
