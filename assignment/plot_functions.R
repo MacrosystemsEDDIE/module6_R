@@ -8,22 +8,23 @@ plot_lake_data <- function(lake_df){
   cols <- RColorBrewer::brewer.pal(8, "Dark2") # Set custom color palette for our plot - ooh we are fancy!! :-)
   
   ggplot() +
-    geom_line(data = lake_df, aes(x = date, y = airt, color = "Air temperature")) +
-    geom_line(data = lake_df, aes(x = date, y = wtemp, color = "Water temperature")) +
+    geom_point(data = lake_df, aes(x = date, y = airt, color = "Air temperature")) +
+    geom_point(data = lake_df, aes(x = date, y = wtemp, color = "Water temperature")) +
     scale_color_manual(values = cols[5:6], name = "") +
     ylab("Temperature (\u00B0C)") +
     xlab("Time") +
     guides(color = guide_legend(override.aes = list(size = 3))) +
-    theme_bw(base_size = 18)
+    theme_bw(base_size = 18) +
+    theme(legend.position = "bottom")
 }
 
-plot_airtemp_forecast <- function(lake_obs, noaa_fc){
+plot_airtemp_forecast <- function(lake_obs, noaa_fc, forecast_start_date){
   l.cols <- RColorBrewer::brewer.pal(8, "Set2")[-c(1, 2)] # Defining another custom color palette :-)
   
   ggplot() +
     geom_point(data = lake_obs, aes(x = date, y = airt, color = "Observed air temp.")) +
     geom_line(data = noaa_fc, aes(x = forecast_date, y = value, group = ensemble_member, color = "Forecasted air temp."), alpha = 0.6)+
-    geom_vline(xintercept = as_date(fc_date), linetype = "dashed") +
+    geom_vline(xintercept = as_date(forecast_start_date), linetype = "dashed") +
     ylab("Temperature (\u00B0C)") +
     theme_bw(base_size = 12) +
     scale_color_manual(values = c("Observed air temp." = l.cols[1], "Forecasted air temp." = "gray"),
@@ -49,13 +50,13 @@ mod_predictions_watertemp <- function(lake_df2, pred){
     theme_bw(base_size = 12) 
 }
 
-plot_forecast <- function(lake_obs, forecast, fc_date, title){
+plot_forecast <- function(lake_obs, forecast, forecast_start_date, title){
   cols <- RColorBrewer::brewer.pal(8, "Dark2") # Set custom color palette for our plot - ooh we are fancy!! :-)
   
   ggplot() +
     geom_point(data = lake_obs, aes(x = date, y = wtemp, color = "Observed water temp.")) +
     geom_line(data = forecast, aes(x = forecast_date, y = value, color = "Forecasted water temp.", group = ensemble_member)) +
-    geom_vline(xintercept = as_date(fc_date), linetype = "dashed") +
+    geom_vline(xintercept = as_date(forecast_start_date), linetype = "dashed") +
     ylab("Temperature (\u00B0C)") +
     theme_bw(base_size = 12) +
     scale_color_manual(values = c("Forecasted water temp." = cols[1],"Observed water temp." = cols[2]),
@@ -103,6 +104,7 @@ plot_partitioned_uc <- function(sd_df){
   ggplot() +
     geom_bar(data = sd_df, aes(x = forecast_date, y = sd, fill = uc_type), stat = "identity", position = "stack") +
     ylab("Standard Deviation (\u00B0C)") +
+    xlab("Forecasted date") +
     scale_fill_manual(values = c("process" = cols2[1], "parameter" = cols2[2], "initial_conditions" = cols2[3],
                                  "driver" = cols2[4])) +
     scale_x_date(date_breaks = "1 day", date_labels = "%b %d") +
