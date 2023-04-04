@@ -113,6 +113,8 @@ We will use observed water temperature and air temperature data to build a multi
 
 ### Fitting model
 
+##add in bit here about why new drivers would be expected to affect water temp; see MS EDDIE Module 1 visualizations for examples; look at powerpoint or bonus slides for powerpoint
+
 First, build data frame to fit model. We will create a column `wtemp_yday` which is a column of 1-day lags of water temperature.
 
 ```{r}
