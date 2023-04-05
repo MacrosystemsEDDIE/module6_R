@@ -1,8 +1,8 @@
 # Understanding Uncertainty in Ecological Forecasts: Detailed Rubric
 
-## Module weight: 65 pts
+## Module weight: 47 pts
 
-- 2 pts per question for Questions 1-20 in module6.Rmd and Questions 1-10 in module6_assignment.Rmd (total of 60 pts)
+- 2 pts per question for Questions 1-21 in module6.Rmd (total of 42 pts)
     - **0pts**: no code or answer provided
     - **1 pt**: Code provided and includes at least one correct step but is not complete AND/OR (if text answer) response present but limited in depth of answer
     - **2 pt**: Correct code provided AND/OR insightful text answer provided that correctly describes patterns or addresses question.

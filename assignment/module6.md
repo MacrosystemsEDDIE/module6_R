@@ -1,7 +1,7 @@
 Understanding Uncertainty in Ecological Forecasts
 ================
-Tadhg Moore, Mary Lofton, Quinn Thomas, Cayelan Carey
-2023-03-28
+Mary Lofton, Tadhg Moore, R.Quinn Thomas, Cayelan Carey
+2023-04-04
 
 ## Purpose of this R Markdown
 
@@ -146,6 +146,7 @@ library(tidyverse)
 library(lubridate)
 library(RColorBrewer)
 library(ggthemes)
+set.seed(100)
 
 source("./plot_functions.R")
 ```
@@ -160,8 +161,13 @@ site.
 **Q.3 (Shiny)** Use the website linked above to fill out information
 about Lake Barco:
 
-**Answer Q.3** Four letter site identifier: Latitude: Longitude: Lake
-area (km2): Elevation (m):
+**Answer Q.3**
+
+Four letter site identifier:  
+Latitude:  
+Longitude:  
+Lake area (km2):  
+Elevation (m):
 
 ### Water Temperature
 
@@ -192,22 +198,13 @@ bodies as a result of increasing water temperature.
 Read in and view lake data.
 
 ``` r
-lake_df <- read_csv("data/BARC_airt_wtemp_celsius.csv")
+lake_df <- read_csv("data/BARC_airt_wtemp_celsius.csv", show_col_types = FALSE)
 ```
 
-    ## Rows: 456 Columns: 3
-    ## ── Column specification ────────────────────────────────────────────────────────
-    ## Delimiter: ","
-    ## dbl  (2): airt, wtemp
-    ## date (1): date
-    ## 
-    ## ℹ Use `spec()` to retrieve the full column specification for this data.
-    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-
-Build time series plot of air temperature and water temperature. If you
-are comparing to the shiny app, this should match the time series plot
-you see in “Activity A, Objective 3: Build a water temperature model” IF
-you selected Lake Barco as your site.
+Build a time series plot of air temperature and water temperature. If
+you are comparing to the Shiny app, this should match the time series
+plot you see in “Activity A, Objective 3: Build a water temperature
+model” IF you selected Lake Barco as your site.
 
 ``` r
 plot_lake_data(lake_df)
@@ -249,42 +246,35 @@ Read in and view air temperature forecast. We will be working with a
 NOAA forecast generated on 2020-09-25
 
 ``` r
-noaa_fc <- read_csv("./data/BARC_airt_forecast_NOAA_GEFS.csv")
+weather_forecast <- read_csv("./data/BARC_airt_forecast_NOAA_GEFS.csv", show_col_types = FALSE)
 ```
 
-    ## Rows: 240 Columns: 4
-    ## ── Column specification ────────────────────────────────────────────────────────
-    ## Delimiter: ","
-    ## chr  (1): forecast_variable
-    ## dbl  (2): ensemble_member, value
-    ## date (1): forecast_date
-    ## 
-    ## ℹ Use `spec()` to retrieve the full column specification for this data.
-    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-
-Voila! We now have an object called “noaa_fc” which is a two-dimensional
-data frame containing a 7-day-ahead NOAA air temperature forecast. Let’s
-look at “noaa_fc”.
+Voila! We now have an object called “weather_forecast” which is a
+two-dimensional data frame containing a 7-day-ahead NOAA air temperature
+forecast. Let’s look at “weather_forecast”.
 
 ``` r
-head(noaa_fc)
+head(weather_forecast)
 ```
 
     ## # A tibble: 6 × 4
-    ##   forecast_date forecast_variable ensemble_member value
-    ##   <date>        <chr>                       <dbl> <dbl>
-    ## 1 2020-09-25    air_temperature                 1  27.0
-    ## 2 2020-09-25    air_temperature                 2  27.3
-    ## 3 2020-09-25    air_temperature                 3  27.9
-    ## 4 2020-09-25    air_temperature                 4  26.6
-    ## 5 2020-09-25    air_temperature                 5  27.3
-    ## 6 2020-09-25    air_temperature                 6  27.2
+    ##   forecast_date ensemble_member variable        value
+    ##   <date>                  <dbl> <chr>           <dbl>
+    ## 1 2020-09-25                  1 air_temperature  27.0
+    ## 2 2020-09-26                  1 air_temperature  27.6
+    ## 3 2020-09-27                  1 air_temperature  28.0
+    ## 4 2020-09-28                  1 air_temperature  25.8
+    ## 5 2020-09-29                  1 air_temperature  25.3
+    ## 6 2020-09-30                  1 air_temperature  21.4
 
-The columns are the following: - forecast_date: this is the date for
-which temperature is forecasted - forecast_variable: this is the
-variable being forecasted - ensemble_member: this is an identifier for
-each member of the 30-member ensemble - value: this is the value of the
-forecasted variable (in our case, degrees Celsius)
+The columns are the following:  
+- **forecast_date**: this is the date for which temperature is
+forecasted.  
+- **forecast_variable**: this is the variable being forecasted.  
+- **ensemble_member**: this is an identifier for each member of the
+30-member ensemble.  
+- **value**: this is the value of the forecasted variable (in our case,
+degrees Celsius).
 
 Now we will plot the NOAA forecast.
 
@@ -292,19 +282,19 @@ Data wrangling of observed air temperature data at Lake Barco so we can
 plot observed and forecasted air temperature on one time series plot
 
 ``` r
-fc_date <- "2020-09-25"
+forecast_start_date <- "2020-09-25"
 
 lake_obs <- lake_df %>%
   filter(date >= "2020-09-22" & date <= "2020-10-02") %>%
-  mutate(wtemp = ifelse(date > fc_date, NA, wtemp),
-         airt = ifelse(date > fc_date, NA, airt))
+  mutate(wtemp = ifelse(date > forecast_start_date, NA, wtemp),
+         airt = ifelse(date > forecast_start_date, NA, airt))
 ```
 
 Build plot. This should match the time series plot in Activity B,
 Objective 9 - Driver Uncertainty IF you selected Lake Barco as your site
 
 ``` r
-plot_airtemp_forecast(lake_obs, noaa_fc)
+plot_airtemp_forecast(lake_obs, weather_forecast, forecast_start_date)
 ```
 
     ## Warning: Removed 7 rows containing missing values (`geom_point()`).
@@ -316,7 +306,7 @@ do they represent? Be as specific as you can.
 
 **Answer Q.6**
 
-## 3. Build a multiple linear regression forecast model
+## 3. Build a linear regression forecast model
 
 We will use observed water temperature and air temperature data to build
 a linear regression model to predict water temperature.
@@ -336,10 +326,12 @@ straight-line relationship between two variables. Linear relationships
 can be expressed either in a graphical format where the variable and the
 constant are connected via a straight line or in a mathematical format
 where the independent variable is multiplied by the slope coefficient,
-added by a constant, which determines the dependent variable.
+added by a constant, which determines the dependent variable. A
+*multiple linear regression* includes more than one independent
+variable, each multipled by its own coefficient.
 
-In our example, water temperature is the dependent variable and air
-temperature is the independent variable.
+In our example, water temperature is the dependent variable and lagged
+water temperature and air temperature are the independent variables.
 
 #### What is model error?
 
@@ -369,7 +361,7 @@ of that parameter.
 
 ### Fitting model
 
-First, build data frame to fit model. We will create a column
+First, build a data frame to fit the model. We will create a column
 `wtemp_yday` which is a column of 1-day lags of water temperature.
 
 ``` r
@@ -377,8 +369,9 @@ model_data <- lake_df %>%
   mutate(wtemp_yday = lag(wtemp))
 ```
 
-Fit a multiple linear regression model using both yesterday’s water
-temperature and today’s air temperature.
+Fit a multiple linear regression model using yesterday’s water
+temperature and today’s air temperature to predict today’s water
+temperature.
 
 ``` r
 fit <- lm(model_data$wtemp ~ model_data$airt + model_data$wtemp_yday)
@@ -412,13 +405,13 @@ Calculate model predictions.
 mod <- predict(fit, model_data)
 ```
 
-Assess model fit by calculating $R^2$, (`r2`), mean bias (`err`), and
+Assess model fit by calculating $R^2$ (`r2`), mean bias (`err`), and
 RMSE (`RMSE`).
 
 ``` r
 r2 <- round(fit.summ$r.squared, 2) 
-err <- mean(mod - model_data$wtemp, na.rm = TRUE) 
-rmse <- round(sqrt(mean((mod - model_data$wtemp)^2, na.rm = TRUE)), 2) 
+err <- mean(mod - lake_df$wtemp, na.rm = TRUE) 
+rmse <- round(sqrt(mean((mod - lake_df$wtemp)^2, na.rm = TRUE)), 2) 
 ```
 
 Prepare data frames for plotting.
@@ -433,8 +426,8 @@ pred <- tibble(date = model_data$date,
 ```
 
 Build plot of modeled and observed water temperature. This should match
-the plot you see in the Shiny app Activity A, Objective 5 - Improve
-Model for Forecasting IF you selected Lake Barco as your site.
+the plot you see in the Shiny app Activity A, Objective 3 - Build a
+water temperature model IF you selected Lake Barco as your site.
 
 ``` r
 mod_predictions_watertemp(lake_df2, pred)
@@ -482,7 +475,7 @@ horizon (the farthest into the future we want to forecast) is 7 days.
 
 ``` r
 forecast_horizon <- 7
-fc_dates <- seq(from = ymd(fc_date), to = ymd(fc_date)+7, by = "day")
+forecasted_dates <- seq(from = ymd(forecast_start_date), to = ymd(forecast_start_date)+7, by = "day")
 ```
 
 Pull the current observed water temperature to be our initial, or
@@ -490,7 +483,7 @@ starting, condition.
 
 ``` r
 curr_wt <- lake_df %>% 
-  filter(date == fc_date) %>%
+  filter(date == forecast_start_date) %>%
   pull(wtemp)
 ```
 
@@ -501,12 +494,12 @@ all future values of water temperature to NA, which will subsequently be
 replaced with forecasted values by our model.
 
 ``` r
-forecast_deterministic <- tibble(forecast_date = rep(fc_dates, times = n_members),
-                            ensemble_member = rep(1:n_members, each = length(fc_dates)),
+forecast_deterministic <- tibble(forecast_date = rep(forecasted_dates, times = n_members),
+                            ensemble_member = rep(1:n_members, each = length(forecasted_dates)),
                             forecast_variable = "water_temperature",
                             value = as.double(NA),
                             uc_type = "deterministic") %>%
-  mutate(value = ifelse(forecast_date == fc_date, curr_wt, NA))
+  mutate(value = ifelse(forecast_date == forecast_start_date, curr_wt, NA))
 ```
 
 Run forecast. Here, we loop through days into the future and generate
@@ -516,22 +509,22 @@ temperature and today’s air temperature. Note the use of the
 temperature values each day.
 
 ``` r
-for(d in 2:length(fc_dates)) {
+for(d in 2:length(forecasted_dates)) {
   
   #pull prediction dataframe for relevant date
     temp_pred <- forecast_deterministic %>%
-      filter(forecast_date == fc_dates[d])
+      filter(forecast_date == forecasted_dates[d])
     
   #pull driver data for relevant date; here we select only 1 ensemble member from the NOAA air temperature forecast
-    temp_driv <- noaa_fc %>%
-      filter(forecast_date == fc_dates[d] & ensemble_member == 1)
+    temp_driv <- weather_forecast %>%
+      filter(forecast_date == forecasted_dates[d] & ensemble_member == 1)
     
-  #pull lagged water temp values
+   #pull lagged water temp values
     temp_lag <- forecast_deterministic %>%
-      filter(forecast_date == fc_dates[d-1])
+      filter(forecast_date == forecasted_dates[d-1])
     
   #run model
-    temp_pred$value <- temp_driv$value * coeffs[2] + temp_lag$value * coeffs[3] + coeffs[1]
+    temp_pred$value <- coeffs[1] + temp_driv$value * coeffs[2] + temp_lag$value * coeffs[3] 
     
   #insert values back into forecast dataframe
     forecast_deterministic <- forecast_deterministic %>%
@@ -547,7 +540,7 @@ today’s forecasted air temperature to forecast water temperature
 ``` r
 plot_forecast(lake_obs, 
               forecast = forecast_deterministic, 
-              fc_date,
+              forecast_start_date,
               title = "Deterministic forecast")
 ```
 
@@ -602,34 +595,34 @@ the `forecast_deterministic` dataframe because we are now forecasting
 with 30 ensemble members.
 
 ``` r
-forecast_driver_unc <- tibble(forecast_date = rep(fc_dates, times = n_members),
-                            ensemble_member = rep(1:n_members, each = length(fc_dates)),
+forecast_driver_unc <- tibble(forecast_date = rep(forecasted_dates, times = n_members),
+                            ensemble_member = rep(1:n_members, each = length(forecasted_dates)),
                             forecast_variable = "water_temperature",
                             value = as.double(NA),
                             uc_type = "driver") %>%
-  mutate(value = ifelse(forecast_date == fc_date, curr_wt, NA)) 
+  mutate(value = ifelse(forecast_date == forecast_start_date, curr_wt, NA)) 
 ```
 
 Run forecast. Notice that we now pull the entire driver ensemble of the
 NOAA forecast for each day instead of just ensemble member 1.
 
 ``` r
-for(d in 2:length(fc_dates)) {
+for(d in 2:length(forecasted_dates)) {
   
   #pull prediction dataframe for relevant date
     temp_pred <- forecast_driver_unc %>%
-      filter(forecast_date == fc_dates[d])
+      filter(forecast_date == forecasted_dates[d])
     
   #pull driver ensemble for relevant date; here we are using all 30 NOAA ensemble members
-    temp_driv <- noaa_fc %>%
-      filter(forecast_date == fc_dates[d])
+    temp_driv <- weather_forecast %>%
+      filter(forecast_date == forecasted_dates[d])
     
-  #pull lagged water temp values
+   #pull lagged water temp values
     temp_lag <- forecast_driver_unc %>%
-      filter(forecast_date == fc_dates[d-1])
+      filter(forecast_date == forecasted_dates[d-1])
     
   #run model
-    temp_pred$value <- temp_driv$value * coeffs[2] + temp_lag$value * coeffs[3] + coeffs[1]
+    temp_pred$value <- coeffs[1] + temp_driv$value * coeffs[2] + temp_lag$value * coeffs[3] 
     
   #insert values back into forecast dataframe
     forecast_driver_unc <- forecast_driver_unc %>%
@@ -643,7 +636,7 @@ the R Shiny app, Activity B Objective 9 (“Both” model)
 ``` r
 plot_forecast(lake_obs, 
               forecast = forecast_driver_unc, 
-              fc_date,
+              forecast_start_date,
               title = "Forecast with Driver Uncertainty")
 ```
 
@@ -692,11 +685,11 @@ generate distributions around each model parameter. You will then use
 these parameter distributions to incorporate parameter uncertainty into
 your water temperature forecasts.
 
-Our model has three parameters: $\beta_0$, the intercept of the linear
-regression, $\beta_1$, the coefficient on tomorrow’s air temperature,
-and $\beta_2$, the coefficient on today’s water temperature.
+Our model has three parameters: $\beta_1$, the intercept of the linear
+regression, $\beta_2$, the coefficient on tomorrow’s air temperature,
+and $\beta_3$, the coefficient on today’s water temperature.
 
-$$WaterTemp_{t+1} = \beta_0 + \beta_1*AirTemp_{t+1} + \beta_2*WaterTemp_t$$
+$$WaterTemp_{t+1} = \beta_1 + \beta_2*AirTemp_{t+1} + \beta_3*WaterTemp_t$$
 When we fit our model, we obtained an estimate of the error around the
 mean of each of these parameters, which is stored in the `params.se`
 object. So instead of thinking of parameters as fixed values, we can
@@ -704,10 +697,10 @@ think of them as distributions (here, a normal distribution) with some
 mean $(\mu)$ and variance (here represented by standard deviation, or
 $\sigma$):
 
-$$\beta_0 \sim {\mathrm Norm}(\mu, \sigma)$$
+$$\beta_1 \sim {\mathrm Norm}(\mu, \sigma)$$
 
 Now, we will generate parameter distributions based on parameter
-estimates for the multiple linear regression model.
+estimates for the linear regression model.
 
 **HINT** Examine the `coeffs` and `params.se` objects we created when we
 fit the multiple regression model above. Think about what information
@@ -777,25 +770,25 @@ uncertainty into your forecasts.
 
 **NOTE** Similar to how we used each of the 30 NOAA GEFS ensemble
 members to generate 30 slightly different forecasts that made up an
-ensemble with driver uncertainty, you will need to use slightly
-different parameter values to generate multiple forecasts that together,
-make up an ensemble incorporating parameter uncertainty. So here, each
-of your water temperature forecast ensemble members will use the
-**same** NOAA forecast but will have **different** parameter values
-drawn from your parameter distributions. This allows us to quantify how
-much uncertainty is coming from our model parameters while holding all
-other sources of uncertainty constant.
+ensemble with driver uncertainty, we will need to use slightly different
+parameter values to generate multiple forecasts that together, make up
+an ensemble incorporating parameter uncertainty. So here, each of our
+water temperature forecast ensemble members will use the **same** NOAA
+forecast but will have **different** parameter values drawn from our
+parameter distributions. This allows us to quantify how much uncertainty
+is coming from our model parameters while holding all other sources of
+uncertainty constant.
 
 Setting up an empty dataframe that we will fill with our water
 temperature predictions.
 
 ``` r
-forecast_parameter_unc <- tibble(forecast_date = rep(fc_dates, times = n_members),
-                            ensemble_member = rep(1:n_members, each = length(fc_dates)),
+forecast_parameter_unc <- tibble(forecast_date = rep(forecasted_dates, times = n_members),
+                            ensemble_member = rep(1:n_members, each = length(forecasted_dates)),
                             forecast_variable = "water_temperature",
                             value = as.double(NA),
                             uc_type = "parameter") %>%
-  mutate(value = ifelse(forecast_date == fc_date, curr_wt, NA)) 
+  mutate(value = ifelse(forecast_date == forecast_start_date, curr_wt, NA)) 
 ```
 
 Run forecast.
@@ -809,22 +802,22 @@ distributions instead of the `coeffs` object, so our parameter values
 are now uncertain rather than fixed.
 
 ``` r
-for(d in 2:length(fc_dates)) {
+for(d in 2:length(forecasted_dates)) {
   
   #pull prediction dataframe for relevant date
     temp_pred <- forecast_parameter_unc %>%
-      filter(forecast_date == fc_dates[d])
+      filter(forecast_date == forecasted_dates[d])
     
   #pull driver data for relevant date; here we select only 1 ensemble member from the NOAA air temperature forecast
-    temp_driv <- noaa_fc %>%
-      filter(forecast_date == fc_dates[d] & ensemble_member == 1)
+    temp_driv <- weather_forecast %>%
+      filter(forecast_date == forecasted_dates[d] & ensemble_member == 1)
     
   #pull lagged water temp values
     temp_lag <- forecast_parameter_unc %>%
-      filter(forecast_date == fc_dates[d-1])
+      filter(forecast_date == forecasted_dates[d-1])
     
   #run model using parameter distributions instead of fixed values
-    temp_pred$value <- temp_driv$value * param.df$beta2 + temp_lag$value * param.df$beta3 + param.df$beta1
+    temp_pred$value <- param.df$beta1 + temp_driv$value * param.df$beta2 + temp_lag$value * param.df$beta3
     
   #insert values back into forecast dataframe
     forecast_parameter_unc <- forecast_parameter_unc %>%
@@ -838,14 +831,15 @@ the R Shiny app, Activity B Objective 7 (“Both” model)
 ``` r
 plot_forecast(lake_obs, 
               forecast = forecast_parameter_unc, 
-              fc_date,
+              forecast_start_date,
               title = "Forecast with Parameter Uncertainty")
 ```
 
     ## Warning: Removed 7 rows containing missing values (`geom_point()`).
 
-![](module6_files/figure-gfm/unnamed-chunk-34-1.png)<!-- --> **Q.14
-(Shiny)** Can you think of potential ways to reduce parameter
+![](module6_files/figure-gfm/unnamed-chunk-34-1.png)<!-- -->
+
+**Q.14 (Shiny)** Can you think of potential ways to reduce parameter
 uncertainty?
 
 **Answer Q.14**
@@ -859,26 +853,28 @@ Our “simple” water temperature model uses today’s water temperature and
 tomorrow’s forecasted air temperature to forecast tomorrow’s water
 temperature.
 
-$$WaterTemp_{t+1} = \beta_0 + \beta_1*AirTemp_{t+1} + \beta_2*WaterTemp_t$$
-
+$$WaterTemp_{t+1} = \beta_1 + \beta_2*AirTemp_{t+1} + \beta_3*WaterTemp_t$$
 But we know that water temperature can be affected by other processes as
 well (such as rain, inflow streams to a lake, or water column mixing, to
 name a few) and that our model has simplified or ignored these. To
 account for the uncertainty these simplifications introduce to our
 model, we can add in process noise (W) to our model at each time step.
-In this model, water temperature tomorrow is equal to water temperature
-today plus air temperature tomorrow plus some noise (W),
+In this model, water temperature tomorrow is equal to today’s water
+temperature plus tomorrow’s forecasted air temperature plus some noise
+(W),
 
-$$WaterTemp_{t+1} = \beta_0 + \beta_1*AirTemp_{t+1} + \beta_2*WaterTemp_t + W$$
+$$WaterTemp_{t+1} = \beta_1 + \beta_2*AirTemp_{t+1} + \beta_3*WaterTemp_t + W$$
+
 where process noise is equal to a random number drawn from a normal
 distribution with a mean of zero and a standard deviation ($\sigma$).
 
-$$W \sim {\mathrm Norm}(0, \sigma)$$ To account for process uncertainty,
-we can run the model multiple times with random noise added to each
-model run. More noise is associated with high process uncertainty, and
-vice versa.
+$$W \sim {\mathrm Norm}(0, \sigma)$$
 
-**NOTE** Remember, we want to isolate the effect of process uncertainty
+To account for process uncertainty, we can run the model multiple times
+with random noise added to each model run. More noise is associated with
+high process uncertainty, and vice versa.
+
+**NOTE:** Remember, we want to isolate the effect of process uncertainty
 on our forecast so we can quantify it. Below, we will **only**
 incorporate process uncertainty below (i.e., driver data and parameter
 values will be constant across all ensemble members).
@@ -894,40 +890,40 @@ Setting up an empty dataframe that we will fill with our water
 temperature predictions.
 
 ``` r
-forecast_process_unc <- tibble(forecast_date = rep(fc_dates, times = n_members),
-                            ensemble_member = rep(1:n_members, each = length(fc_dates)),
+forecast_process_unc <- tibble(forecast_date = rep(forecasted_dates, times = n_members),
+                            ensemble_member = rep(1:n_members, each = length(forecasted_dates)),
                             forecast_variable = "water_temperature",
                             value = as.double(NA),
                             uc_type = "process") %>%
-  mutate(value = ifelse(forecast_date == fc_date, curr_wt, NA)) 
+  mutate(value = ifelse(forecast_date == forecast_start_date, curr_wt, NA)) 
 ```
 
 Run forecast.
 
 **Notice** that we only pull a single member of the NOAA air temperature
-forecast so that we can focus on the contribution of parameter
-uncertainty alone to our forecast.
+forecast so that we can focus on the contribution of process uncertainty
+alone to our forecast.
 
 **Notice** that process uncertainty is defined using the `rnorm()`
 function with a standard deviation of `sigma`.
 
 ``` r
-for(d in 2:length(fc_dates)) {
+for(d in 2:length(forecasted_dates)) {
   
   #pull prediction dataframe for relevant date
     temp_pred <- forecast_process_unc %>%
-      filter(forecast_date == fc_dates[d])
+      filter(forecast_date == forecasted_dates[d])
     
   #pull driver data for relevant date; here we select only 1 ensemble member from the NOAA air temperature forecast
-    temp_driv <- noaa_fc %>%
-      filter(forecast_date == fc_dates[d] & ensemble_member == 1)
+    temp_driv <- weather_forecast %>%
+      filter(forecast_date == forecasted_dates[d] & ensemble_member == 1)
     
   #pull lagged water temp values
-    temp_lag <- forecast_parameter_unc %>%
-      filter(forecast_date == fc_dates[d-1])
+    temp_lag <- forecast_process_unc %>%
+      filter(forecast_date == forecasted_dates[d-1])
     
-  #run model using parameter distributions instead of fixed values
-    temp_pred$value <- temp_driv$value * coeffs[2] + temp_lag$value * coeffs[3] + coeffs[1] + rnorm(n = 30, mean = 0, sd = sigma)
+  #run model with process uncertainty added 
+    temp_pred$value <- coeffs[1] + temp_driv$value * coeffs[2] + temp_lag$value * coeffs[3] + rnorm(n = 30, mean = 0, sd = sigma)
     
   #insert values back into forecast dataframe
     forecast_process_unc <- forecast_process_unc %>%
@@ -941,7 +937,7 @@ the R Shiny app, Activity B Objective 6 (“Both” model)
 ``` r
 plot_forecast(lake_obs, 
               forecast = forecast_process_unc, 
-              fc_date,
+              forecast_start_date,
               title = "Forecast with Process Uncertainty")
 ```
 
@@ -951,9 +947,9 @@ plot_forecast(lake_obs,
 
 ## 8. Generate a forecast with initial conditions uncertainty
 
-Initial conditions uncertainty refers to uncertainty arising because the
-initial conditions are not precisely known or because the calculations
-cannot be performed with the precise initial conditions.
+**Initial conditions** uncertainty refers to uncertainty arising because
+the initial conditions are not precisely known or because the
+calculations cannot be performed with the precise initial conditions.
 
 Even though we have measurements of water temperature from our lake, we
 know that water temperature varies throughout the day so this
@@ -963,10 +959,7 @@ temperature measurements.
 
 To account for initial condition uncertainty we can generate a
 distribution around the initial condition and then run our model with
-slightly different initial conditions to account for this uncertainty.
-
-The following questions guide you through the process of quantifying
-initial conditions uncertainty.
+slightly different initial conditions.
 
 Generate a distribution of initial conditions for your forecast using
 the current water temperature (`curr_wt`) and a standard deviation of
@@ -974,12 +967,12 @@ the current water temperature (`curr_wt`) and a standard deviation of
 
 ``` r
 ic_sd <- 0.1 
-ic_uc <- rnorm(n = 30, mean = curr_wt, sd = ic_sd)
+ic_uc <- rnorm(n = n_members, mean = curr_wt, sd = ic_sd)
 ```
 
 Plot the distribution around your initial condition. This should
 resemble the initial condition distribution plot in the R Shiny app,
-Activity B Objective 8 (“Both” model).
+Activity B Objective 8 (“Atemp” model).
 
 ``` r
 plot_ic_dist(curr_wt, ic_uc)
@@ -995,7 +988,7 @@ a slightly different initial conditions value.
 Create dataframe with distribution of initial conditions.
 
 ``` r
-ic_df <- tibble(forecast_date = rep(as.Date(fc_date), times = n_members),
+ic_df <- tibble(forecast_date = rep(as.Date(forecast_start_date), times = n_members),
                 ensemble_member = c(1:n_members),
                 forecast_variable = "water_temperature",
                 value = ic_uc,
@@ -1008,8 +1001,8 @@ function to populate the starting date of the forecast with values from
 our initial conditions distribution.
 
 ``` r
-forecast_ic_unc <- tibble(forecast_date = rep(fc_dates, times = n_members),
-                            ensemble_member = rep(1:n_members, each = length(fc_dates)),
+forecast_ic_unc <- tibble(forecast_date = rep(forecasted_dates, times = n_members),
+                            ensemble_member = rep(1:n_members, each = length(forecasted_dates)),
                             forecast_variable = "water_temperature",
                             value = as.double(NA),
                             uc_type = "initial_conditions") %>%
@@ -1020,22 +1013,22 @@ forecast_ic_unc <- tibble(forecast_date = rep(fc_dates, times = n_members),
 Run forecast.
 
 ``` r
-for(d in 2:length(fc_dates)) {
+for(d in 2:length(forecasted_dates)) {
   
   #pull prediction dataframe for relevant date
     temp_pred <- forecast_ic_unc %>%
-      filter(forecast_date == fc_dates[d])
+      filter(forecast_date == forecasted_dates[d])
     
   #pull driver data for relevant date; here we select only 1 ensemble member from the NOAA air temperature forecast
-    temp_driv <- noaa_fc %>%
-      filter(forecast_date == fc_dates[d] & ensemble_member == 1)
+    temp_driv <- weather_forecast %>%
+      filter(forecast_date == forecasted_dates[d] & ensemble_member == 1)
     
   #pull lagged water temp values
     temp_lag <- forecast_ic_unc %>%
-      filter(forecast_date == fc_dates[d-1])
+      filter(forecast_date == forecasted_dates[d-1])
     
   #run model using initial conditions distribution instead of a fixed value
-    temp_pred$value <- temp_driv$value * coeffs[2] + temp_lag$value * coeffs[3] + coeffs[1] 
+    temp_pred$value <- coeffs[1] + temp_driv$value * coeffs[2] + temp_lag$value * coeffs[3]
     
   #insert values back into forecast dataframe
     forecast_ic_unc <- forecast_ic_unc %>%
@@ -1049,7 +1042,7 @@ the R Shiny app, Activity B Objective 8 (“Both” model)
 ``` r
 plot_forecast(lake_obs, 
               forecast = forecast_ic_unc, 
-              fc_date,
+              forecast_start_date,
               title = "Forecast with Initial Condition Uncertainty")
 ```
 
@@ -1083,8 +1076,8 @@ function to populate the starting date of the forecast with values from
 our initial conditions distribution.
 
 ``` r
-forecast_total_unc <- tibble(forecast_date = rep(fc_dates, times = n_members),
-                            ensemble_member = rep(1:n_members, each = length(fc_dates)),
+forecast_total_unc <- tibble(forecast_date = rep(forecasted_dates, times = n_members),
+                            ensemble_member = rep(1:n_members, each = length(forecasted_dates)),
                             forecast_variable = "water_temperature",
                             value = as.double(NA),
                             uc_type = "total") %>%
@@ -1097,22 +1090,22 @@ fixed values, and have added process uncertainty to each iteration of
 our forecast.
 
 ``` r
-for(d in 2:length(fc_dates)) {
+for(d in 2:length(forecasted_dates)) {
   
   #pull prediction dataframe for relevant date
     temp_pred <- forecast_total_unc %>%
-      filter(forecast_date == fc_dates[d])
+      filter(forecast_date == forecasted_dates[d])
     
   #pull driver ensemble for relevant date; here we are using all 30 NOAA ensemble members
-    temp_driv <- noaa_fc %>%
-      filter(forecast_date == fc_dates[d])
+    temp_driv <- weather_forecast %>%
+      filter(forecast_date == forecasted_dates[d])
     
-  #pull lagged water temp values
+     #pull lagged water temp values
     temp_lag <- forecast_total_unc %>%
-      filter(forecast_date == fc_dates[d-1])
+      filter(forecast_date == forecasted_dates[d-1])
     
-  #run model using initial conditions distribution instead of a fixed value
-    temp_pred$value <- temp_driv$value * param.df$beta2 + temp_lag$value * param.df$beta3 + param.df$beta1 + rnorm(n = 30, mean = 0, sd = sigma) 
+  #run model using initial conditions and parameter distributions instead of fixed values, and adding process uncertainty
+    temp_pred$value <- param.df$beta1 + temp_driv$value * param.df$beta2 + temp_lag$value * param.df$beta3 + rnorm(n = 30, mean = 0, sd = sigma) 
     
   #insert values back into forecast dataframe
     forecast_total_unc <- forecast_total_unc %>%
@@ -1126,7 +1119,7 @@ the R Shiny app, Activity C Objective 10 (“Both” model)
 ``` r
 plot_forecast(lake_obs, 
               forecast = forecast_total_unc, 
-              fc_date,
+              forecast_start_date,
               title = "Forecast with Total Uncertainty")
 ```
 
@@ -1164,15 +1157,16 @@ sd_df <- all_forecast_df %>%
 
 Plot the contribution of each source of uncertainty to total forecast
 uncertainty. This should resemble the uncertainty quantification plot in
-the R Shiny app, Activity C, Objective 10 (“Both” model).
+the R Shiny app, Activity C, Objective 10 (“Atemp” model).
 
 ``` r
 plot_partitioned_uc(sd_df)
 ```
 
-![](module6_files/figure-gfm/unnamed-chunk-50-1.png)<!-- --> **Q.17
-(Shiny)** Which source of uncertainty contributes the most to total
-forecast uncertainty?
+![](module6_files/figure-gfm/unnamed-chunk-50-1.png)<!-- -->
+
+**Q.17 (Shiny)** Which source of uncertainty contributes the most to
+total forecast uncertainty?
 
 **Answer Q.17**
 
@@ -1191,6 +1185,11 @@ same or different quantities of uncertainty? Why?
 models would have the same or different quantities of uncertainty? Why?
 
 **Answer Q.20**
+
+**Q.21 (Rmd)** How long did it take you to complete this module from
+start to finish?
+
+**Answer Q.21**
 
 Congratulations! You have quantified all the uncertainty. Now, have a
 nap. :-)
