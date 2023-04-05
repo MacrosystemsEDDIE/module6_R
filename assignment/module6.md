@@ -1,7 +1,7 @@
 Understanding Uncertainty in Ecological Forecasts
 ================
 Mary Lofton, Tadhg Moore, R.Quinn Thomas, Cayelan Carey
-2023-04-04
+2023-04-05
 
 ## Purpose of this R Markdown
 
@@ -367,21 +367,32 @@ First, build a data frame to fit the model. We will create a column
 ``` r
 model_data <- lake_df %>%
   mutate(wtemp_yday = lag(wtemp))
+head(model_data)
 ```
+
+    ## # A tibble: 6 × 4
+    ##   date        airt wtemp wtemp_yday
+    ##   <date>     <dbl> <dbl>      <dbl>
+    ## 1 2018-05-04  21.8  27.7       NA  
+    ## 2 2018-05-05  21.6  26.4       27.7
+    ## 3 2018-05-06  24.1  26.6       26.4
+    ## 4 2018-05-07  24.2  27.1       26.6
+    ## 5 2018-05-08  22.1  27.1       27.1
+    ## 6 2018-05-09  22.1  27.1       27.1
 
 Fit a multiple linear regression model using yesterday’s water
 temperature and today’s air temperature to predict today’s water
 temperature.
 
 ``` r
-fit <- lm(model_data$wtemp ~ model_data$airt + model_data$wtemp_yday)
-fit.summ <- summary(fit)
+linear_fit <- lm(model_data$wtemp ~ model_data$airt + model_data$wtemp_yday)
+fit_summary <- summary(linear_fit)
 ```
 
 View model coefficients and save them for our forecasts later.
 
 ``` r
-coeffs <- round(fit$coefficients, 2)
+coeffs <- round(linear_fit$coefficients, 2)
 coeffs
 ```
 
@@ -392,8 +403,8 @@ View standard errors of estimated model coefficients and save them for
 our forecasts later.
 
 ``` r
-params.se <- fit.summ$coefficients[,2]
-params.se
+params_se <- fit_summary$coefficients[,2]
+params_se
 ```
 
     ##           (Intercept)       model_data$airt model_data$wtemp_yday 
@@ -402,14 +413,15 @@ params.se
 Calculate model predictions.
 
 ``` r
-mod <- predict(fit, model_data)
+mod <- predict(linear_fit, data = model_data)
+mod <- c(NA, mod)
 ```
 
 Assess model fit by calculating $R^2$ (`r2`), mean bias (`err`), and
 RMSE (`RMSE`).
 
 ``` r
-r2 <- round(fit.summ$r.squared, 2) 
+r2 <- round(fit_summary$r.squared, 2) 
 err <- mean(mod - lake_df$wtemp, na.rm = TRUE) 
 rmse <- round(sqrt(mean((mod - lake_df$wtemp)^2, na.rm = TRUE)), 2) 
 ```
@@ -444,7 +456,7 @@ model in your own words. How is water temperature being predicted?
 (`coeffs`). What does this tell you about the relative importance of
 past water temperature and current air temperature in driving current
 water temperature? Examine the standard errors of the parameters
-(`params.se`). What do the standard errors tell you about how confident
+(`params_se`). What do the standard errors tell you about how confident
 we are in the fitted model parameter values?
 
 **Answer Q.8**
@@ -509,19 +521,19 @@ temperature and today’s air temperature. Note the use of the
 temperature values each day.
 
 ``` r
-for(d in 2:length(forecasted_dates)) {
+for(i in 2:length(forecasted_dates)) {
   
   #pull prediction dataframe for relevant date
     temp_pred <- forecast_deterministic %>%
-      filter(forecast_date == forecasted_dates[d])
+      filter(forecast_date == forecasted_dates[i])
     
   #pull driver data for relevant date; here we select only 1 ensemble member from the NOAA air temperature forecast
     temp_driv <- weather_forecast %>%
-      filter(forecast_date == forecasted_dates[d] & ensemble_member == 1)
+      filter(forecast_date == forecasted_dates[i] & ensemble_member == 1)
     
    #pull lagged water temp values
     temp_lag <- forecast_deterministic %>%
-      filter(forecast_date == forecasted_dates[d-1])
+      filter(forecast_date == forecasted_dates[i-1])
     
   #run model
     temp_pred$value <- coeffs[1] + temp_driv$value * coeffs[2] + temp_lag$value * coeffs[3] 
@@ -607,19 +619,19 @@ Run forecast. Notice that we now pull the entire driver ensemble of the
 NOAA forecast for each day instead of just ensemble member 1.
 
 ``` r
-for(d in 2:length(forecasted_dates)) {
+for(i in 2:length(forecasted_dates)) {
   
   #pull prediction dataframe for relevant date
     temp_pred <- forecast_driver_unc %>%
-      filter(forecast_date == forecasted_dates[d])
+      filter(forecast_date == forecasted_dates[i])
     
   #pull driver ensemble for relevant date; here we are using all 30 NOAA ensemble members
     temp_driv <- weather_forecast %>%
-      filter(forecast_date == forecasted_dates[d])
+      filter(forecast_date == forecasted_dates[i])
     
    #pull lagged water temp values
     temp_lag <- forecast_driver_unc %>%
-      filter(forecast_date == forecasted_dates[d-1])
+      filter(forecast_date == forecasted_dates[i-1])
     
   #run model
     temp_pred$value <- coeffs[1] + temp_driv$value * coeffs[2] + temp_lag$value * coeffs[3] 
@@ -691,7 +703,7 @@ and $\beta_3$, the coefficient on today’s water temperature.
 
 $$WaterTemp_{t+1} = \beta_1 + \beta_2*AirTemp_{t+1} + \beta_3*WaterTemp_t$$
 When we fit our model, we obtained an estimate of the error around the
-mean of each of these parameters, which is stored in the `params.se`
+mean of each of these parameters, which is stored in the `params_se`
 object. So instead of thinking of parameters as fixed values, we can
 think of them as distributions (here, a normal distribution) with some
 mean $(\mu)$ and variance (here represented by standard deviation, or
@@ -702,7 +714,7 @@ $$\beta_1 \sim {\mathrm Norm}(\mu, \sigma)$$
 Now, we will generate parameter distributions based on parameter
 estimates for the linear regression model.
 
-**HINT** Examine the `coeffs` and `params.se` objects we created when we
+**HINT** Examine the `coeffs` and `params_se` objects we created when we
 fit the multiple regression model above. Think about what information
 they contain and how you might use that information to generate a
 **parameter distribution**.
@@ -715,7 +727,7 @@ coeffs
     ##                  0.95                  0.18                  0.81
 
 ``` r
-params.se
+params_se
 ```
 
     ##           (Intercept)       model_data$airt model_data$wtemp_yday 
@@ -746,19 +758,19 @@ hist(example_distribution$draws)
 ![](module6_files/figure-gfm/unnamed-chunk-29-1.png)<!-- -->
 
 Use the `rnorm()` function and the information in the `coeffs` and
-`params.se` objects to generate parameter distributions for each of the
+`params_se` objects to generate parameter distributions for each of the
 parameters in the multiple regression model.
 
 ``` r
-param.df <- data.frame(beta1 = rnorm(30, coeffs[1], params.se[1]),
-                 beta2 = rnorm(30, coeffs[2], params.se[2]),
-                 beta3 = rnorm(30, coeffs[3], params.se[3]))
+param_df <- data.frame(beta1 = rnorm(30, coeffs[1], params_se[1]),
+                 beta2 = rnorm(30, coeffs[2], params_se[2]),
+                 beta3 = rnorm(30, coeffs[3], params_se[3]))
 ```
 
 Plot each of the parameter distributions you have created.
 
 ``` r
-plot_param_dist(param.df)
+plot_param_dist(param_df)
 ```
 
     ## Using  as id variables
@@ -797,27 +809,27 @@ Run forecast.
 forecast so that we can focus on the contribution of parameter
 uncertainty alone to our forecast.
 
-**Notice** that parameter values are now pulled from our `param.df`
+**Notice** that parameter values are now pulled from our `param_df`
 distributions instead of the `coeffs` object, so our parameter values
 are now uncertain rather than fixed.
 
 ``` r
-for(d in 2:length(forecasted_dates)) {
+for(i in 2:length(forecasted_dates)) {
   
   #pull prediction dataframe for relevant date
     temp_pred <- forecast_parameter_unc %>%
-      filter(forecast_date == forecasted_dates[d])
+      filter(forecast_date == forecasted_dates[i])
     
   #pull driver data for relevant date; here we select only 1 ensemble member from the NOAA air temperature forecast
     temp_driv <- weather_forecast %>%
-      filter(forecast_date == forecasted_dates[d] & ensemble_member == 1)
+      filter(forecast_date == forecasted_dates[i] & ensemble_member == 1)
     
   #pull lagged water temp values
     temp_lag <- forecast_parameter_unc %>%
-      filter(forecast_date == forecasted_dates[d-1])
+      filter(forecast_date == forecasted_dates[i-1])
     
   #run model using parameter distributions instead of fixed values
-    temp_pred$value <- param.df$beta1 + temp_driv$value * param.df$beta2 + temp_lag$value * param.df$beta3
+    temp_pred$value <- param_df$beta1 + temp_driv$value * param_df$beta2 + temp_lag$value * param_df$beta3
     
   #insert values back into forecast dataframe
     forecast_parameter_unc <- forecast_parameter_unc %>%
@@ -908,19 +920,19 @@ alone to our forecast.
 function with a standard deviation of `sigma`.
 
 ``` r
-for(d in 2:length(forecasted_dates)) {
+for(i in 2:length(forecasted_dates)) {
   
   #pull prediction dataframe for relevant date
     temp_pred <- forecast_process_unc %>%
-      filter(forecast_date == forecasted_dates[d])
+      filter(forecast_date == forecasted_dates[i])
     
   #pull driver data for relevant date; here we select only 1 ensemble member from the NOAA air temperature forecast
     temp_driv <- weather_forecast %>%
-      filter(forecast_date == forecasted_dates[d] & ensemble_member == 1)
+      filter(forecast_date == forecasted_dates[i] & ensemble_member == 1)
     
   #pull lagged water temp values
     temp_lag <- forecast_process_unc %>%
-      filter(forecast_date == forecasted_dates[d-1])
+      filter(forecast_date == forecasted_dates[i-1])
     
   #run model with process uncertainty added 
     temp_pred$value <- coeffs[1] + temp_driv$value * coeffs[2] + temp_lag$value * coeffs[3] + rnorm(n = 30, mean = 0, sd = sigma)
@@ -1013,19 +1025,19 @@ forecast_ic_unc <- tibble(forecast_date = rep(forecasted_dates, times = n_member
 Run forecast.
 
 ``` r
-for(d in 2:length(forecasted_dates)) {
+for(i in 2:length(forecasted_dates)) {
   
   #pull prediction dataframe for relevant date
     temp_pred <- forecast_ic_unc %>%
-      filter(forecast_date == forecasted_dates[d])
+      filter(forecast_date == forecasted_dates[i])
     
   #pull driver data for relevant date; here we select only 1 ensemble member from the NOAA air temperature forecast
     temp_driv <- weather_forecast %>%
-      filter(forecast_date == forecasted_dates[d] & ensemble_member == 1)
+      filter(forecast_date == forecasted_dates[i] & ensemble_member == 1)
     
   #pull lagged water temp values
     temp_lag <- forecast_ic_unc %>%
-      filter(forecast_date == forecasted_dates[d-1])
+      filter(forecast_date == forecasted_dates[i-1])
     
   #run model using initial conditions distribution instead of a fixed value
     temp_pred$value <- coeffs[1] + temp_driv$value * coeffs[2] + temp_lag$value * coeffs[3]
@@ -1090,22 +1102,22 @@ fixed values, and have added process uncertainty to each iteration of
 our forecast.
 
 ``` r
-for(d in 2:length(forecasted_dates)) {
+for(i in 2:length(forecasted_dates)) {
   
   #pull prediction dataframe for relevant date
     temp_pred <- forecast_total_unc %>%
-      filter(forecast_date == forecasted_dates[d])
+      filter(forecast_date == forecasted_dates[i])
     
   #pull driver ensemble for relevant date; here we are using all 30 NOAA ensemble members
     temp_driv <- weather_forecast %>%
-      filter(forecast_date == forecasted_dates[d])
+      filter(forecast_date == forecasted_dates[i])
     
      #pull lagged water temp values
     temp_lag <- forecast_total_unc %>%
-      filter(forecast_date == forecasted_dates[d-1])
+      filter(forecast_date == forecasted_dates[i-1])
     
   #run model using initial conditions and parameter distributions instead of fixed values, and adding process uncertainty
-    temp_pred$value <- param.df$beta1 + temp_driv$value * param.df$beta2 + temp_lag$value * param.df$beta3 + rnorm(n = 30, mean = 0, sd = sigma) 
+    temp_pred$value <- param_df$beta1 + temp_driv$value * param_df$beta2 + temp_lag$value * param_df$beta3 + rnorm(n = 30, mean = 0, sd = sigma) 
     
   #insert values back into forecast dataframe
     forecast_total_unc <- forecast_total_unc %>%
