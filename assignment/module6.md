@@ -258,14 +258,14 @@ head(weather_forecast)
 ```
 
     ## # A tibble: 6 × 4
-    ##   forecast_date forecast_variable ensemble_member value
-    ##   <date>        <chr>                       <dbl> <dbl>
-    ## 1 2020-09-25    air_temperature                 1  27.0
-    ## 2 2020-09-25    air_temperature                 2  27.3
-    ## 3 2020-09-25    air_temperature                 3  27.9
-    ## 4 2020-09-25    air_temperature                 4  26.6
-    ## 5 2020-09-25    air_temperature                 5  27.3
-    ## 6 2020-09-25    air_temperature                 6  27.2
+    ##   forecast_date ensemble_member variable        value
+    ##   <date>                  <dbl> <chr>           <dbl>
+    ## 1 2020-09-25                  1 air_temperature  27.0
+    ## 2 2020-09-26                  1 air_temperature  27.6
+    ## 3 2020-09-27                  1 air_temperature  28.0
+    ## 4 2020-09-28                  1 air_temperature  25.8
+    ## 5 2020-09-29                  1 air_temperature  25.3
+    ## 6 2020-09-30                  1 air_temperature  21.4
 
 The columns are the following:  
 - **forecast_date**: this is the date for which temperature is

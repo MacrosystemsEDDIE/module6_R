@@ -10,7 +10,7 @@ load_noaa_forecast <- function(siteID, start_date){
   fils <- fils[-c(grep("ens00", fils))]
   fid <- nc_open(file.path(fpath, fils[1]))
   vars <- fid$var # Extract variable names for selection
-  fc_vars <- c("air_temperature", "surface_downwelling_shortwave_flux_in_air", "wind_speed","precipitation_flux") # names(vars)
+  fc_vars <- c("air_temperature", "surface_downwelling_shortwave_flux_in_air", "wind_speed") # names(vars)
   membs <- length(fils)
   
   out <- lapply(start_date, function(dat) {

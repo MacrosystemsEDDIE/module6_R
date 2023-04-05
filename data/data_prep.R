@@ -3,7 +3,6 @@
 library(tidyverse)
 library(lubridate)
 library(ncdf4)
-library(reshape)
 library(neonUtilities)
 
 #define NEON token
@@ -28,16 +27,16 @@ list2env(wnd, .GlobalEnv)
 #format data
 wnd2 <- WSDBuoy_30min %>%
   select(siteID, startDateTime, buoyWindSpeedMean) %>%
-  mutate(Date = date(startDateTime)) %>%
-  rename(Lake = siteID) %>%
-  group_by(Lake, Date) %>%
+  mutate(date = date(startDateTime)) %>%
+  rename(lake = siteID) %>%
+  group_by(lake, date) %>%
   summarize(wnd = mean(buoyWindSpeedMean, na.rm = TRUE)) %>%
-  arrange(Lake, Date) %>%
+  arrange(lake, date) %>%
   ungroup() %>%
-  select(-Lake)
+  select(-lake)
 
 #plot formatted data
-ggplot(data = wnd2, aes(x = Date, y = wnd))+
+ggplot(data = wnd2, aes(x = date, y = wnd))+
   geom_point()+
   theme_bw()
 
@@ -70,7 +69,7 @@ lake_df$month <- lubridate::month(lake_df$Date)
 lake_df <- lake_df[(lake_df$month %in% 5:10), 1:3]
 
 # Rename columnns to sensible names after joining
-colnames(lake_df)[-1] <- c("airt", "wtemp")
+colnames(lake_df) <- c("date", "airt", "wtemp")
 
 # Limit data to complete cases (rows with both air and water temperature available)
 lake_df$airt[is.na(lake_df$wtemp)] <- NA
@@ -83,11 +82,11 @@ write.csv(lake_df, file = "./assignment/data/BARC_airt_wtemp_celsius.csv", row.n
 #left join to shortwave and windspeed data
 sw <- read.csv("./data/BARC_swr_wattsPerSquareMeter.csv") %>%
   rename(swr = V1) %>%
-  mutate(Date = as.Date(Date))
+  mutate(date = as.Date(Date)) %>%
+  select(-Date)
 
-lake_df <- left_join(lake_df, sw, by = "Date") %>%
-  left_join(., wnd2, by = "Date") %>%
-  filter(complete.cases(.)) 
+lake_df <- left_join(lake_df, sw, by = "date") %>%
+  left_join(., wnd2, by = "date") 
 
 lake_df2 <- lake_df %>%
   pivot_longer(airt:wnd, names_to = "variable", values_to = "value")
@@ -99,6 +98,8 @@ write.csv(lake_df2, file = "./data/BARC_lakedata.csv", row.names = FALSE)
 ####DATA WRANGLING FOR NOAA FORECAST ####
 source("./data/load_noaa_forecast.R")
 source("./data/convert_forecast.R")
+library(reshape)
+
 
 #set siteID
 siteID = "BARC"
@@ -122,3 +123,5 @@ ggplot(data = out$met_forecast, aes(x = forecast_date, y = value))+
 
 write.csv(out$met_forecast, file = "./data/BARC_forecast_NOAA_GEFS.csv", row.names = FALSE)
 write.csv(out$airtemp_fc, file = "./data/BARC_airt_forecast_NOAA_GEFS.csv", row.names = FALSE)
+write.csv(out$met_forecast, file = "./assignment/data/BARC_forecast_NOAA_GEFS.csv", row.names = FALSE)
+write.csv(out$airtemp_fc, file = "./assignment/data/BARC_airt_forecast_NOAA_GEFS.csv", row.names = FALSE)

@@ -16,14 +16,13 @@ convert_forecast <- function(noaa_fc, start_date){
     df <- noaa_fc[[start_date]]
     sub <- df[(df[, 2] %in% c("air_temperature",
                               "surface_downwelling_shortwave_flux_in_air",
-                              "wind_speed",
-                              "precipitation_flux")), c(1, 2, 2 + x)]
+                              "wind_speed")), c(1, 2, 2 + x)]
     df2 <- tidyr::pivot_wider(data = sub, id_cols = time, names_from = L1, values_from = 3)
     df2$air_temperature <- df2$air_temperature - 273.15
     df2$date <- as.Date(df2$time)
     df2$time <- NULL
     df3 <- plyr::ddply(df2, "date", function(y){
-      colMeans(y[, 1:4], na.rm = TRUE)
+      colMeans(y[, 1:3], na.rm = TRUE)
     })
     # df3 <- df3[2:16, ]
     fc_out_dates <<- df3$date
@@ -36,7 +35,7 @@ convert_forecast <- function(noaa_fc, start_date){
   l1 <- fc_conv_list
   idvars <- colnames(l1[[1]])
   mlt1 <- tibble(reshape::melt(l1, id.vars = idvars))
-  colnames(mlt1)[c(2:5,7)] <- c("air_temperature","precipitation","shortwave_radiation","wind_speed","ensemble_member")
+  colnames(mlt1)[c(2:4,6)] <- c("air_temperature","shortwave_radiation","wind_speed","ensemble_member")
   
   met_forecast <- mlt1 %>%
     pivot_longer(air_temperature:wind_speed, names_to = "variable",values_to = "value") %>% 
