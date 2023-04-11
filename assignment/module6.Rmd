@@ -96,7 +96,7 @@ library(RColorBrewer)
 library(ggthemes)
 set.seed(100)
 
-source("./plot_functions.R")
+source("R/plot_functions.R")
 ```
 
 ## 1. Read in and visualize data from Lake Barco, FL, USA
@@ -143,7 +143,7 @@ Build a time series plot of air temperature and water temperature.  If you are c
 plot_lake_data(lake_df)
 ```
 
-**Q.5 (Shiny)** Do you think there is a linear relationship between air temperature and water temperature at this lake? 
+**Q.5 (Shiny)** Do you think there is a strong relationship between air temperature and water temperature at this lake? 
 
 **Answer Q.5**
 
@@ -161,7 +161,7 @@ Here, we read in NOAA forecast data that has been wrangled into a suitable forma
 Read in and view air temperature forecast.  We will be working with a NOAA forecast generated on 2020-09-25
 
 ```{r}
-weather_forecast <- read_csv("./data/BARC_airt_forecast_NOAA_GEFS.csv", show_col_types = FALSE)
+weather_forecast <- read_csv("data/BARC_airt_forecast_NOAA_GEFS.csv", show_col_types = FALSE)
 ```
 
 Voila! We now have an object called "weather_forecast" which is a two-dimensional data frame containing a 7-day-ahead NOAA air temperature forecast. Let's look at "weather_forecast".
@@ -276,7 +276,8 @@ Assess model fit by calculating $R^2$ (`r2`), mean bias (`err`), and RMSE (`RMSE
 
 ```{r}
 r2 <- round(fit_summary$r.squared, 2) 
-err <- mean(mod - lake_df$wtemp, na.rm = TRUE) 
+residuals <- mod - lake_df$wtemp
+err <- mean(residuals, na.rm = TRUE) 
 rmse <- round(sqrt(mean((mod - lake_df$wtemp)^2, na.rm = TRUE)), 2) 
 ```
 
@@ -613,9 +614,10 @@ To account for process uncertainty, we can run the model multiple times with ran
 
 **NOTE:** Remember, we want to isolate the effect of process uncertainty on our forecast so we can quantify it. Below, we will **only** incorporate process uncertainty below (i.e., driver data and parameter values will be constant across all ensemble members). 
 
-Define the standard deviation of the process uncertainty distribution, `sigma`.
+Define the standard deviation of the process uncertainty distribution, `sigma` as the standard deviation of the residuals. This is the uncertainty left over after we found the best parameters for fitting the model.
+
 ```{r}
-sigma <- 0.2 # Process Uncertainty Noise Std Dev.; this is your sigma
+sigma <- sd(residuals, na.rm = TRUE) # Process Uncertainty Noise Std Dev.; this is your sigma
 ```
 
 Setting up an empty dataframe that we will fill with our water temperature predictions. 
@@ -677,6 +679,7 @@ Even though we have measurements of water temperature from our lake, we know tha
 To account for initial condition uncertainty we can generate a distribution around the initial condition and then run our model with slightly different initial conditions.
 
 Generate a distribution of initial conditions for your forecast using the current water temperature (`curr_wt`) and a standard deviation of 0.1 degrees Celsius (`ic_sd`).
+
 ```{r}
 ic_sd <- 0.1 
 ic_uc <- rnorm(n = n_members, mean = curr_wt, sd = ic_sd)
@@ -830,8 +833,7 @@ Group the dataframe by date and the type of uncertainty included in the forecast
 ```{r}
 sd_df <- all_forecast_df %>%
   group_by(forecast_date, uc_type) %>%
-  summarize(sd = sd(value, na.rm = TRUE)) %>%
-  ungroup()
+  summarize(sd = sd(value, na.rm = TRUE), .groups = "drop")
 ```
 
 Plot the contribution of each source of uncertainty to total forecast uncertainty. This should resemble the uncertainty quantification plot in the R Shiny app, Activity C, Objective 10 ("Atemp" model).
