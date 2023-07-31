@@ -244,7 +244,7 @@ A parameter is a value in a model that describes the rate of change in those sta
 
 A parameter distribution shows the possible values for a parameter value and how often they occur. For example, a normal distribution of a parameter has a bell-shaped curve, and the mean is the most likely value of that parameter.
 
-### Fitting model
+### Fit model
 
 First, build a data frame to fit the model. We will create a column `wtemp_yday` which is a column of 1-day lags of water temperature.
 
@@ -335,9 +335,9 @@ for(i in 1:8){
   print("Hello World!")
 }
 ```
-**Notice:**
+**Notice:**      
 1. We specify the number of times the for-loop should run with the code `for(i in 1:8)`. We will explain what the `i` refers to when we discuss indexing below.  
-2. The code that is repeatedly run is contained in brackets `{}`
+2. The code that is repeatedly run is contained in brackets `{}`.
 
 #### What is indexing in a for-loop?
 
@@ -398,7 +398,7 @@ for(i in 2:8){
 }
 ```
   
-Of course, this is probably not a very good model for predicting water temperature, because it would lead to water temperature increasing infinitely into the future! Now, we will use the concept of a for-loop to make a forecast of water temperature using the linear model you fit above.
+Of course, this is probably not a very good model for predicting water temperature, because it would lead to water temperature increasing infinitely into the future! Next, we will use the concept of a for-loop to make a forecast of water temperature using the linear model you fit above.
 
 ### Run Deterministic Water Temperature Forecast 
 
@@ -988,8 +988,8 @@ model_data <- lake_df %>%
 **Answer Q.18** Edit the code block to provide your answer
 
 ```{r}
-fit <- lm(model_data$wtemp ~ model_data$wtemp_yday + model_data$airt + model_data$swr + model_data$wnd) #INSERT ADDITIONAL COVARIATES HERE
-fit.summ <- summary(fit)
+fit <- lm(model_data$wtemp ~ model_data$wtemp_yday + model_data$airt) #INSERT ADDITIONAL COVARIATES IN THE PARENTHESES
+fit_summary <- summary(fit)
 ```
 
 View model coefficients and save them for our forecasts later.
@@ -1002,8 +1002,8 @@ coeffs
 View standard errors of estimated model coefficients and save them for our forecasts later.
 
 ```{r}
-params.se <- fit.summ$coefficients[,2]
-params.se
+params_se <- fit_summary$coefficients[,2]
+params_se
 ```
 
 Calculate model predictions.
@@ -1016,9 +1016,9 @@ Assess model fit by calculating $R^2$, (`r2`), mean bias (`err`), and RMSE (`RMS
 
 ```{r}
 r2 <- round(fit_summary$r.squared, 2) 
-residuals <- mod - lake_df$wtemp
+residuals <- mod - model_data$wtemp
 err <- mean(residuals, na.rm = TRUE) 
-rmse <- round(sqrt(mean((mod - lake_df$wtemp)^2, na.rm = TRUE)), 2) 
+rmse <- round(sqrt(mean((mod - model_data$wtemp)^2, na.rm = TRUE)), 2) 
 ```
 
 Prepare data frames for plotting.
@@ -1107,7 +1107,7 @@ to:
     temp_pred$value <- coeffs[1] + temp_lag$value * coeffs[2] + temp_driv$air_temperature * coeffs[3] + temp_driv$solar_radiation * coeffs[4] 
 ```
 
-*Hint:* Make sure you multiply each coefficient by the correct driver!
+**HINT** Make sure you multiply each coefficient by the correct driver!
   
 **Answer Q.20** Edit the code block below to provide your answer.
 ```{r}
@@ -1160,13 +1160,15 @@ $$\beta_1 \sim {\mathrm Norm}(\mu, \sigma)$$
 
 Now, we will generate parameter distributions based on parameter estimates for the multiple linear regression model.  
 
-**Q.21** Use the `rnorm()` function and the information in the `coeffs` and `params.se` objects to adapt the code below to generate parameter distributions for each of the parameters in your multiple regression model. *Hint:* you may need to add additional columns, (`beta4`,`beta5`...), to the dataframe and populate them with draws from a normal distribution.
+**Q.21** Use the `rnorm()` function and the information in the `coeffs` and `params.se` objects to adapt the code below to generate parameter distributions for each of the parameters in your multiple regression model. 
+
+**HINT** you may need to add additional columns, (`beta4`,`beta5`...), to the dataframe and populate them with draws from a normal distribution.
 
 **Answer Q.21** Edit the code block below to provide your answer.
 ```{r}
-param.df <- data.frame(beta1 = rnorm(30, coeffs[1], params.se[1]),
-                 beta2 = rnorm(30, coeffs[2], params.se[2]),
-                 beta3 = rnorm(30, coeffs[3], params.se[3]))
+param.df <- data.frame(beta1 = rnorm(30, coeffs[1], params_se[1]),
+                 beta2 = rnorm(30, coeffs[2], params_se[2]),
+                 beta3 = rnorm(30, coeffs[3], params_se[3]))
 ```
 
 Plot each of the parameter distributions you have created. 
@@ -1192,9 +1194,9 @@ Run forecast.
 
 **Q.22** Adjust the forecast code below to pull parameter values from the parameter distributions you created in the `param.df` object, rather than using fixed values from the `coeffs` object. 
 
-*Hint 1:* Before you add in parameter uncertainty, don't forget to update the for-loop to run your unique model! Hopefully you can copy-paste your answer to Q.25 above to accomplish this step.
+**HINT 1** Before you add in parameter uncertainty, don't forget to update the for-loop to run your unique model! Hopefully you can copy-paste your answer to Q.25 above to accomplish this step.
 
-*Hint 2:* You will know you have succeeded in incorporating parameter uncertainty if your forecast plot shows multiple ensemble members; if your plot has only one line, you have not yet successfully included parameter uncertainty. 
+**HINT 2** You will know you have succeeded in incorporating parameter uncertainty if your forecast plot shows multiple ensemble members; if your plot has only one line, you have not yet successfully included parameter uncertainty. 
 
 **Answer Q.22**
 ```{r}
@@ -1252,7 +1254,7 @@ Run forecast.
 
 **Q.23** Adjust the forecast code below under `#run model` to run your unique model with process uncertainty.
 
-*Hint:* The code `+ rnorm(30, mean = 0, sd = sigma)` is what adds process uncertainty to your model - don't accidentally delete this!
+**HINT** The code `+ rnorm(30, mean = 0, sd = sigma)` is what adds process uncertainty to your model - don't accidentally delete this!
 
 **Answer Q.23** Edit the code block below to provide your answer.
 ```{r}
@@ -1415,6 +1417,6 @@ Compare contribution of initial conditions uncertainty:
 
 Congratulations! You have quantified all the uncertainty. Now, have a nap. :-)  
   
-## Knitting and committing
+## Knitting, committing, and submitting
 
-Remember to Knit your document as a `github_document` and comment+push to GitHub your code, knitted document, and any files in the `figure-gfm` subdirectory that was created when you knitted the document.
+Be sure to check with your instructor as to how this assignment is to be submitted and graded. If necessary, remember to Knit your document and commit+push your code to GitHub.
