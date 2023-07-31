@@ -1,7 +1,3 @@
-# Title: Convert NOAA GEFS forecast to water temperature and uPAR
-# Author: Tadhg Moore, Mary Lofton
-# Date: 20JUL23
-
 #' convert NOAA GEFS forecast to water temperature and uPAR forecast using
 #' output from linear regression models of NEON variables
 #'
