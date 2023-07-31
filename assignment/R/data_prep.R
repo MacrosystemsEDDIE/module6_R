@@ -1,4 +1,6 @@
-#Data prep for Mod 6 R version
+# Title: Data prep for Mod 6 R version
+# Author: Mary Lofton
+# Date: 20JUL23
 
 library(tidyverse)
 library(lubridate)

@@ -1,3 +1,7 @@
+# Title: Load NOAA forecast for Mod 6 R versionn
+# Author: Tadhg Moore, Mary Lofton
+# Date: 20JUL23
+
 #' load NOAA GEFS forecast
 #'
 #' @param siteID name of NEON lake site

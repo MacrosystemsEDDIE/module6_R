@@ -1,4 +1,6 @@
-#plotting functions
+# Title: Plotting functions for Module 6: Understanding Uncertainty in Ecological Forecasts
+# Author: Tadhg Moore, Mary Lofton
+# Date: 20JUL23
 
 library(tidyverse)
 library(lubridate)

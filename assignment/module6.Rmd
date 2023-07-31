@@ -1,6 +1,6 @@
 ---
 title: "Understanding Uncertainty in Ecological Forecasts"
-author: "Mary Lofton, Tadhg Moore, R.Quinn Thomas, Cayelan Carey"
+author: "Tadhg Moore, Mary Lofton, R.Quinn Thomas, Cayelan Carey"
 date: "`r Sys.Date()`"
 output:
   github_document: default
@@ -65,7 +65,7 @@ Finally, we will put it all together to generate a forecast that incorporates al
 9. Generate a forecast incorporating all sources of uncertainty. 
 10. Partition uncertainty.  
 
-There are a total of 20 questions embedded throughout this module, many of which parallel (and in some cases are identical to) questions in the R Shiny app version of the module. Questions which are identical to those in the Shiny app will be indicated with **(Shiny)**, while questions unique to this RMarkdown will be indicated with **(Rmd)**. Note that question numbers will differ between the RMarkdown and the Shiny app, even if the question text is the same. Please see the module rubric for possible points per question and confirm with your instructor whether and how the module will be graded. 
+There are a total of 22 questions embedded throughout this module, many of which parallel (and in some cases are identical to) questions in the R Shiny app version of the module. Questions which are identical to those in the Shiny app will be indicated with **(Shiny)**, while questions unique to this RMarkdown will be indicated with **(Rmd)**. Note that question numbers will differ between the RMarkdown and the Shiny app, even if the question text is the same. Please see the module rubric for possible points per question and confirm with your instructor whether and how the module will be graded. 
 
 ## Think About It!
 
@@ -83,8 +83,11 @@ There are a total of 20 questions embedded throughout this module, many of which
 
 ## Set-up
 
-We will install and load some packages that are needed to run the module code. If you do not currently have the packages below downloaded for RStudio, you will need to install them first using the `install.packages()` function.
-
+We will install and load some packages that are needed to run the module code. If you do not currently have the packages below downloaded for RStudio, you will need to install them first using the `install.packages()` function.  
+  
+In addition, we will `set.seed()`. This ensures that random processes (such as randomly selected numbers) will produce the same output every time, so your results will be consistent with other students in the class.  
+  
+Finally, we will source - which means read in the code and functions from - an R script (plot_functions.R) that contains some plotting code so the plots you generate here will resemble those in the Shiny app version of this module.
 ```{r, message = FALSE}
 # install.packages("tidyverse")
 # install.packages("lubridate")
@@ -94,6 +97,7 @@ library(tidyverse)
 library(lubridate)
 library(RColorBrewer)
 library(ggthemes)
+
 set.seed(100)
 
 source("R/plot_functions.R")
@@ -158,7 +162,7 @@ NOAA GEFS forecasts are **ensemble forecasts**. Ensemble forecasts are generated
 
 Here, we read in NOAA forecast data that has been wrangled into a suitable format for our exercise: a two-dimensional data frame containing a 7-day-ahead air temperature forecast with 30 ensemble members.
 
-Read in and view air temperature forecast.  We will be working with a NOAA forecast generated on 2020-09-25
+Read in and view air temperature forecast.  We will be working with a NOAA forecast generated on 2020-09-25.
 
 ```{r}
 weather_forecast <- read_csv("data/BARC_airt_forecast_NOAA_GEFS.csv", show_col_types = FALSE)
@@ -189,7 +193,7 @@ lake_obs <- lake_df %>%
          airt = ifelse(date > forecast_start_date, NA, airt))
 ```
 
-Build plot. This should match the time series plot in Activity B, Objective 9 - Driver Uncertainty IF you selected Lake Barco as your site
+Build plot. This should match the time series plot in Activity B, Objective 9 - Driver Uncertainty IF you selected Lake Barco as your site.
 
 ```{r}
 plot_airtemp_forecast(lake_obs, weather_forecast, forecast_start_date)
@@ -247,7 +251,7 @@ head(model_data)
 Fit a multiple linear regression model using yesterday's water temperature and today's air temperature to predict today's water temperature.
 
 ```{r}
-linear_fit <- lm(model_data$wtemp ~ model_data$airt + model_data$wtemp_yday)
+linear_fit <- lm(model_data$wtemp ~ model_data$wtemp_yday + model_data$airt)
 fit_summary <- summary(linear_fit)
 ```
 
@@ -314,6 +318,83 @@ mod_predictions_watertemp(lake_df2, pred)
 
 
 ## 4. Generate a deterministic forecast (without uncertainty)
+
+### First Things First: Understanding For-Loops for Ecological Forecasting 
+
+#### What is a for-loop?
+
+A **for-loop** runs a section of code repeatedly. The number of times the for-loop runs is specified by the coder, either by specifying a number of times the code should be run, or by specifying a condition that must be met before the for-loop stops. For example, below we write a for-loop that prints "Hello World!" eight times.
+```{r}
+for(i in 1:8){
+  print("Hello World!")
+}
+```
+**Notice:**
+1. We specify the number of times the for-loop should run with the code `for(i in 1:8)`. We will explain what the `i` refers to when we discuss indexing below.  
+2. The code that is repeatedly run is contained in brackets `{}`
+
+#### What is indexing in a for-loop?
+
+Within a for-loop, **indexing** allows you to refer to a particular iteration, or individual code run, of the loop. This can be useful if you want to, for example, perform a particular calculation on every row of a data frame. In R, `i` is commonly used for indexing in for-loops. Below we write a for-loop that prints the numbers 1 to 8 using indexing.
+```{r}
+for(i in 1:8){
+  print(i)
+}
+```
+#### How is indexing in a for-loop useful for ecological forecasting?
+  
+Often, we want to run a forecast model repeatedly to make predictions for multiple days into the future. For-loops can be a useful way to accomplish this, *particularly* if each day's prediction depends on the previous day.  
+  
+Let's pretend we have a very simple forecast model, where tomorrow's water temperature is equal to today's water temperature + 0.1 degrees Celsius. If we wanted to generate a 7-day prediction of water temperature using this model, we could write a for-loop to do so.  
+  
+First, we set our initial observed water temperature.
+
+```{r}
+starting_temperature <- 15.2 #degrees C
+```
+
+Then, we create an empty vector in which we will store our starting water temperature as well as our predicted water temperatures for the next seven days (so total length of vector = 8 days).
+
+```{r}
+water_temperature <- rep(NA, 8)
+```
+
+Next, we set the first element of our empty vector to be the starting temperature.
+
+```{r}
+water_temperature[1] <- starting_temperature
+water_temperature
+```
+
+Finally, we run a for-loop to generate 7 days of water temperature predictions, which will be stored in the `water_temperature` vector. **Note** that the for-loop starts at the 2nd iteration (`for(i in 2:8)`) because we already know today's water temperature, so we are starting with tomorrow's prediction.
+
+```{r}
+for(i in 2:8){
+  water_temperature[i] = water_temperature[i-1] + 0.1 #degrees C
+  print(water_temperature[i])
+}
+```
+  
+**Q.10 (Rmd)** Can you alter the code below to generate a **10-day** prediction of water temperature rather than a 7-day prediction? What is the predicted water temperature on the 10th day?  
+  
+**Answer Q.10** Edit the code block to provide your answer.
+```{r}
+starting_temperature <- 15.2 #degrees C
+
+water_temperature <- rep(NA, 8)
+
+water_temperature[1] <- starting_temperature
+water_temperature
+
+for(i in 2:8){
+  water_temperature[i] = water_temperature[i-1] + 0.1 #degrees C
+  print(water_temperature[i])
+}
+```
+  
+Of course, this is probably not a very good model for predicting water temperature, because it would lead to water temperature increasing infinitely into the future! Now, we will use the concept of a for-loop to make a forecast of water temperature using the linear model you fit above.
+
+### Run Deterministic Water Temperature Forecast 
 
 Now we will generate a deterministic forecast with our model. We will use **one** ensemble member from the NOAA GEFS air temperature forecast ensemble as input to our multiple linear regression model, thus producing a water temperature prediction for 1 to 7 days into the future with no uncertainty.
 
@@ -384,10 +465,10 @@ plot_forecast(lake_obs,
               title = "Deterministic forecast")
 ```
 
-**Q.10 (Rmd)** Compare the water temperature forecast plot above to the plot of the NOAA GEFS air temperature forecast. Does the forecasted water temperature track the forecasted air temperature, and why might this be?  
+**Q.11 (Rmd)** Compare the water temperature forecast plot above to the plot of the NOAA GEFS air temperature forecast. Does the forecasted water temperature track the forecasted air temperature, and why might this be?  
 
 
-**Answer Q.10** 
+**Answer Q.11** 
 
 
 ### What is wrong with deterministic forecasts?
@@ -454,21 +535,21 @@ plot_forecast(lake_obs,
               title = "Forecast with Driver Uncertainty")
 ```
 
-**Q.11 (Shiny)** How does forecast uncertainty change further into the future?
+**Q.12 (Shiny)** How does forecast uncertainty change further into the future?
 
-**Answer Q.11**
-
-
-
-**Q.12 (Rmd)** Compare the plot above of the probabilistic forecast with driver uncertainty to the plot of the deterministic forecast. How do the differences in these two forecasts affect your understanding of what water temperatures are likely to be during the week of the forecast?  
-
-**Answer Q.12** 
+**Answer Q.12**
 
 
-**Q.13 (Shiny)** Can you think of a way to reduce driver uncertainty in your forecast of water temperature?
+
+**Q.13 (Rmd)** Compare the plot above of the probabilistic forecast with driver uncertainty to the plot of the deterministic forecast. How do the differences in these two forecasts affect your understanding of what water temperatures are likely to be during the week of the forecast?  
+
+**Answer Q.13** 
 
 
-**Answer Q.13**
+**Q.14 (Shiny)** Can you think of a way to reduce driver uncertainty in your forecast of water temperature?
+
+
+**Answer Q.14**
 
 
 
@@ -588,10 +669,10 @@ plot_forecast(lake_obs,
               title = "Forecast with Parameter Uncertainty")
 ```
 
-**Q.14 (Shiny)** Can you think of potential ways to reduce parameter uncertainty?
+**Q.15 (Shiny)** Can you think of potential ways to reduce parameter uncertainty?
 
 
-**Answer Q.14**
+**Answer Q.15**
 
 
 
@@ -751,16 +832,16 @@ plot_forecast(lake_obs,
               title = "Forecast with Initial Condition Uncertainty")
 ```
 
-**Q.15 (Shiny)** What factors can lead to an increase in initial conditions uncertainty?
-
-
-**Answer Q.15**
-
-
-**Q.16 (Shiny)** What potential steps could be taken to reduce initial conditions uncertainty?
+**Q.16 (Shiny)** What factors can lead to an increase in initial conditions uncertainty?
 
 
 **Answer Q.16**
+
+
+**Q.17 (Shiny)** What potential steps could be taken to reduce initial conditions uncertainty?
+
+
+**Answer Q.17**
 
 
 
@@ -842,26 +923,26 @@ Plot the contribution of each source of uncertainty to total forecast uncertaint
 plot_partitioned_uc(sd_df)
 ```
 
-**Q.17 (Shiny)** Which source of uncertainty contributes the most to total forecast uncertainty?
+**Q.18 (Shiny)** Which source of uncertainty contributes the most to total forecast uncertainty?
 
-**Answer Q.17**
+**Answer Q.18**
 
-**Q.18 (Shiny)** You have been given $5,000 to improve your water temperature forecasts. What would you spend it on to reduce your forecast uncertainty?
+**Q.19 (Shiny)** You have been given $5,000 to improve your water temperature forecasts. What would you spend it on to reduce your forecast uncertainty?
 
-**Answer Q.18** 
+**Answer Q.19** 
 
-**Q.19 (Shiny)** Do you think that different lake sites would have the same or different quantities of uncertainty? Why?
-
-**Answer Q.19**
-
-**Q.20 (Rmd)** Do you think that different water temperature forecast models would have the same or different quantities of uncertainty? Why?
+**Q.20 (Shiny)** Do you think that different lake sites would have the same or different quantities of uncertainty? Why?
 
 **Answer Q.20**
 
-
-**Q.21 (Rmd)** How long did it take you to complete this module from start to finish? 
+**Q.21 (Rmd)** Do you think that different water temperature forecast models would have the same or different quantities of uncertainty? Why?
 
 **Answer Q.21**
+
+
+**Q.22 (Rmd)** How long did it take you to complete this module from start to finish? 
+
+**Answer Q.22**
 
 
 Congratulations! You have quantified all the uncertainty. Now, have a nap. :-) 
