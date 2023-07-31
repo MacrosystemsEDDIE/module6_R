@@ -79,8 +79,7 @@ plot_param_dist <- function(param_df){
   # Build plot
   ggplot(plot.params) +
     geom_density(aes(value), fill = l.cols[4], alpha = 0.5) +
-    facet_wrap(~variable, nrow = 1, scales = "free") +
-    # scale_fill_manual(values = l.cols[idx]) +
+    facet_wrap(~variable, nrow = 1, scales = "free_x") +
     theme_bw(base_size = 16)
 }
 
@@ -91,7 +90,6 @@ plot_ic_dist <- function(curr_wt, ic_uc){
   
   #Build plot
   ggplot() +
-    # geom_vline(data = df, aes(xintercept = x, color = label)) +
     geom_vline(xintercept = curr_wt) +
     geom_density(aes(ic_uc), fill = l.cols[2], alpha = 0.3) +
     xlab("Temperature (\u00B0C)") +
