@@ -1,7 +1,7 @@
 # Macrosystems EDDIE Module 6: Understanding Uncertainty in Ecological Forecasts
 
 ## Summary
-**Ecological forecasting** is a tool that can be used for understanding and predicting changes in populations, communities, and ecosystems. Ecological forecasting is an emerging approach which provides an estimate of the future state of an ecological system with uncertainty, allowing society to prepare for changes in important ecosystem services. Forecast **uncertainty** is derived from multiple sources, including model parameters and driver data, among others. Knowing the uncertainty associated with a forecast enables forecast users to evaluate the forecast and make more informed decisions. Ecological forecasters develop and update forecasts using the iterative forecasting cycle, in which they make a hypothesis of how an ecological system works; embed their hypothesis in a model; and use the model to make a forecast of future conditions and quantify forecast uncertainty. There are a number of approaches that forecasters can use to reduce uncertainty, which will be explored in this module.  
+**Ecological forecasting** is a tool that can be used for understanding and predicting changes in populations, communities, and ecosystems. Ecological forecasting is an emerging approach which provides an estimate of the future state of an ecological system with uncertainty, allowing society to prepare for changes in important ecosystem services. Forecast **uncertainty** is derived from multiple sources, including model parameters and driver data, among others. Knowing the uncertainty associated with a forecast enables forecast users to evaluate the forecast and make more informed decisions. Ecological forecasters develop and update forecasts using the iterative forecasting cycle, in which they make a hypothesis of how an ecological system works; embed their hypothesis in a model; use the model to make a forecast of future conditions and quantify forecast uncertainty; and update the forecast when new data is available. There are a number of approaches that forecasters can use to reduce uncertainty, which will be explored in this module.  
   
 This module will guide you through an exploration of the sources of uncertainty within an ecological forecast, how uncertainty can be quantified, and steps which can be taken to reduce the uncertainty in a forecast you develop for a lake ecosystem.  
   
@@ -17,11 +17,11 @@ This module will guide you through an exploration of the sources of uncertainty 
 
 **What is ecological forecast uncertainty?**. 
   
-Uncertainty emerges from some kind of error or imperfection in our knowledge and understanding of the ecological system being investigated.  
+Uncertainty emerges from some kind of error or imperfection in our knowledge, understanding, and measurement of measure ecological system being investigated.  
   
 **Where does ecological forecast uncertainty come from?**
   
-Uncertainty comes from natural variability in the environment and imperfect knowledge of an ecological system. When generating a forecast, uncertainty can come from the structure of the model used, the conditions the model is initialized with, and the data used to drive the model, among other sources.  
+Uncertainty comes from natural variability in the environment and imperfect knowledge and measurements of an ecological system. When generating a forecast, uncertainty can come from the structure of the model used, the conditions the model is initialized with, and the data used to drive the model, among other sources.  
   
 **Why is uncertainty important to quantify for an ecological forecast?**. 
   
@@ -94,9 +94,8 @@ This module is derived from Moore, T. N., Carey, C.C. and Thomas, R. Q. 13 Octob
   
 -   author: Mary Lofton (@melofton)
 -   contact: [melofton\@vt.edu](mailto:melofton@vt.edu)
--   url:
+-   url: EDDIE PAGE?????
 -   date: 2023-03-10
 -   license: MIT, CC-BY
 -   copyright: Mary Lofton
--   package:
 
