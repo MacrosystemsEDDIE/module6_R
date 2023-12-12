@@ -40,7 +40,7 @@ Students will need [R](https://www.r-project.org/) and [RStudio](https://posit.c
 11. RStudio should create a project which allows you to access and manipulate files locally.
 
 ### Committing and pushing changes back to GitHub
-The advantage of accessing the module as an RProject is that you now have version control, which means you can track (and revert if needed) your changes over time. You also have a copy of the project stored remotely (on GitHub) as a backup if your computer is lost or broken. However, in order to benefit from these advantages, you will need to commit and push any changes you make to the module files back to GitHub. To do this from RStudio:
+The advantage of accessing the module as an RProject via GitHub is that you now have version control, which means you can track (and revert if needed) your changes over time. You also have a copy of the project stored remotely (on GitHub) as a backup if your computer is lost or broken. However, in order to benefit from these advantages, you will need to commit and push any changes you make to the module files locally on your computer back to GitHub. To do this from RStudio:
 
 1. Navigate to the "Git" pane in the top right panel of RStudio.
 2. Click the check box next to each file you have changed.
