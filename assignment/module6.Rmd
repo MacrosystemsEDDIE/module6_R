@@ -2,8 +2,7 @@
 title: "Understanding Uncertainty in Ecological Forecasts"
 author: "Tadhg Moore, Mary Lofton, R.Quinn Thomas, Cayelan Carey"
 date: "`r Sys.Date()`"
-output:
-  github_document: default
+output: html_document
 ---
 
 ## Purpose of this R Markdown
@@ -34,11 +33,11 @@ This module will guide you through an exploration of the sources of uncertainty 
 
 ### What is ecological forecast uncertainty? 
 
-Uncertainty emerges from some error or imperfection in our knowledge, understanding, and measurement of the ecological system being investigated.  
+Forecast uncertainty is the range of possible alternate future conditions predicted by a model. We generate multiple different predictions of the future because the future is inherently unknown.  
 
 ### Where does ecological forecast uncertainty come from?
 
-Uncertainty comes from natural variability in the environment, imperfect knowledge of an ecological system, and error when measuring the system. When generating a forecast, uncertainty can come from the structure of the model used, the conditions the model is initialized with, and the data used to drive the model, among other sources.  
+Uncertainty comes from natural variability in the environment, imperfect representation of an ecological system in a model, and error when measuring the system. When generating a forecast, uncertainty can come from the structure of the model used, the initial conditions of the model, the parameters of the model, and the data used to drive the model, among other sources.
 
 ### Why is uncertainty important to quantify for an ecological forecast? 
 
@@ -218,13 +217,18 @@ We will use observed water temperature and air temperature data to build a linea
 
 #### What is an ecological model?
 
-A model is a representation or simplification (physical, conceptual, or mathematical) of an ecological phenomenon (e.g., the abundance of foxes in a forest).
+A model is a representation or simplification (physical, conceptual, or mathematical) of an ecological phenomenon (e.g., the abundance of foxes in a forest), with the goal of understanding and predicting that phenomenon.
 
 #### What is a linear relationship?
 
-A linear relationship is a statistical term used to describe a straight-line relationship between two variables. Linear relationships can be expressed either in a graphical format where the **THIS MAKES NO SENSE TO ME**variable and the constant are connected via a straight line or in a mathematical format where the independent variable is multiplied by the slope coefficient, **WHAT IS THIS** added by a constant, which determines the dependent variable. A *multiple linear regression* includes more than one independent *WHAT IS AN INDEPENDENT VARIABLE** variable, each multiplied by its own coefficient.
+A linear regression model uses the values of one variable (the independent variable; x) to predict another variable (the dependent variable; y), using two parameters.
 
-In our example, water temperature is the dependent variable and lagged **LAG IS NOT DEFINED** water temperature and air temperature are the independent variables.
+The formula for a linear regression is:
+
+$$y = mx + b$$
+where the parameters of the model are m (the slope) and b (the intercept).
+
+In our example, today's water temperature is the dependent variable and yesterday's water temperature and today's air temperature are the independent variables.
 
 #### What is model error?
 
