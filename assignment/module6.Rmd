@@ -2,8 +2,7 @@
 title: "Understanding Uncertainty in Ecological Forecasts"
 author: "Tadhg Moore, Mary Lofton, R.Quinn Thomas, Cayelan Carey"
 date: "`r Sys.Date()`"
-output:
-  github_document: default
+output: html_document
 ---
 
 ## Purpose of this R Markdown
@@ -34,11 +33,11 @@ This module will guide you through an exploration of the sources of uncertainty 
 
 ### What is ecological forecast uncertainty? 
 
-Uncertainty emerges from some error or imperfection in our knowledge, understanding, and measurement of the ecological system being investigated.  
+Forecast uncertainty is the range of possible alternate future conditions predicted by a model. We generate multiple different predictions of the future because the future is inherently unknown.  
 
 ### Where does ecological forecast uncertainty come from?
 
-Uncertainty comes from natural variability in the environment, imperfect knowledge of an ecological system, and error when measuring the system. When generating a forecast, uncertainty can come from the structure of the model used, the conditions the model is initialized with, and the data used to drive the model, among other sources.  
+Uncertainty comes from natural variability in the environment, imperfect representation of an ecological system in a model, and error when measuring the system. When generating a forecast, uncertainty can come from the structure of the model used, the initial conditions of the model, the parameters of the model, and the data used to drive the model, among other sources.
 
 ### Why is uncertainty important to quantify for an ecological forecast? 
 
@@ -48,28 +47,31 @@ Knowing the uncertainty in a forecast allows forecast users to make informed dec
 
 In this module, we will generate forecasts of lake water temperature for 1-7 days into the future. First, we will generate a **deterministic** forecast (with no uncertainty). This will involve the following steps:  
 
-1. Read in and visualize data from Lake Barco, FL, USA. 
-2. Read in and visualize an air temperature forecast for Lake Barco. 
-3. Build a multiple linear regression forecast model. 
-4. Generate a deterministic forecast (without uncertainty). 
+Activity A:   
+Objective 1. Read in and visualize data from Lake Barco, FL, USA. 
+Objective 2. Read in and visualize an air temperature forecast for Lake Barco. 
+Objective 3. Build a multiple linear regression forecast model. 
+Objective 4. Generate a deterministic forecast (without uncertainty). 
 
 Next, we will explore how to incorporate four different kinds of uncertainty that are commonly present in **probabilistic** forecasts: driver data uncertainty, parameter uncertainty, process uncertainty, and initial conditions uncertainty. We will generate forecasts that incorporate these sources of uncertainty one at a time to learn how each form of uncertainty is accounted for. This will involve the following steps:  
 
-5. Generate a forecast with driver uncertainty. 
-6. Generate a forecast with parameter uncertainty. 
-7. Generate a forecast with process uncertainty. 
-8. Generate a forecast with initial conditions uncertainty. 
+Activity B:  
+Objective 5. Generate a forecast with driver uncertainty. 
+Objective 6. Generate a forecast with parameter uncertainty. 
+Objective 7. Generate a forecast with process uncertainty. 
+Objective 8. Generate a forecast with initial conditions uncertainty. 
 
 Then, we will put it all together to generate a forecast that incorporates all four sources of uncertainty. We will also explore the relative contributions of each source of uncertainty to total forecast uncertainty; this is known as **uncertainty partitioning**. This will involve the following steps:  
 
-9. Generate a forecast incorporating all sources of uncertainty. 
-10. Partition uncertainty.  
+Activity C:  
+Objective 9. Generate a forecast incorporating all sources of uncertainty. 
+Objective 10. Partition uncertainty.  
 
 Finally, you will have the opportunity to build your own model to forecast water temperature, and compare the uncertainty in your new model with the previous one. This will involve the following steps:
 
-11. Build and fit your new model.
-12. Generate forecasts with partitioned uncertainty using your new model.
-13. Compare uncertainty contributions between your new model and the previous model.
+Objective 11. Build and fit your new model.
+Objective 12. Generate forecasts with partitioned uncertainty using your new model.
+Objective 13. Compare uncertainty contributions between your new model and the previous model.
 
 There are a total of 27 questions embedded throughout this module, many of which parallel (and in some cases are identical to) questions in the R Shiny app version of the module. Questions which are identical to those in the Shiny app will be indicated with **(Shiny)**, while questions unique to this RMarkdown will be indicated with **(Rmd)**. Note that question numbers will differ between the RMarkdown and the Shiny app, even if the question text is the same. Please see the module rubric for possible points per question and confirm with your instructor whether and how the module will be graded. 
 
@@ -108,8 +110,8 @@ set.seed(100)
 
 source("R/plot_functions.R")
 ```
-
-## 1. Read in and visualize data from Lake Barco, FL, USA
+# Activity A:  
+## Objective 1. Read in and visualize data from Lake Barco, FL, USA
 
 Lake Barco is one of the lake sites in the U.S. National Ecological Observatory Network (NEON). Please refer to https://www.neonscience.org/field-sites/barc to learn more about this site.
 
@@ -158,7 +160,7 @@ plot_lake_data(lake_df)
 **Answer Q.5**
 
 
-## 2. Read in and visualize an air temperature forecast for Lake Barco 
+## Objective 2. Read in and visualize an air temperature forecast for Lake Barco 
 
 We expect that future air temperatures will affect future water temperatures, so we will use air temperature forecasts to help create water temperature forecasts.  
 
@@ -210,7 +212,7 @@ plot_airtemp_forecast(lake_obs, weather_forecast, forecast_start_date)
 **Answer Q.6**
 
 
-## 3. Build a linear regression forecast model 
+## Objective 3. Build a linear regression forecast model 
 
 We will use observed water temperature and air temperature data to build a linear regression model to predict water temperature.  
 
@@ -218,13 +220,18 @@ We will use observed water temperature and air temperature data to build a linea
 
 #### What is an ecological model?
 
-A model is a representation or simplification (physical, conceptual, or mathematical) of an ecological phenomenon (e.g., the abundance of foxes in a forest).
+A model is a representation or simplification (physical, conceptual, or mathematical) of an ecological phenomenon (e.g., the abundance of foxes in a forest), with the goal of understanding and predicting that phenomenon.
 
 #### What is a linear relationship?
 
-A linear relationship is a statistical term used to describe a straight-line relationship between two variables. Linear relationships can be expressed either in a graphical format where the **THIS MAKES NO SENSE TO ME**variable and the constant are connected via a straight line or in a mathematical format where the independent variable is multiplied by the slope coefficient, **WHAT IS THIS** added by a constant, which determines the dependent variable. A *multiple linear regression* includes more than one independent *WHAT IS AN INDEPENDENT VARIABLE** variable, each multiplied by its own coefficient.
+A linear regression model uses the values of one variable (the independent variable; x) to predict another variable (the dependent variable; y), using two parameters.
 
-In our example, water temperature is the dependent variable and lagged **LAG IS NOT DEFINED** water temperature and air temperature are the independent variables.
+The formula for a linear regression is:
+
+$$y = mx + b$$
+where the parameters of the model are m (the slope) and b (the intercept).
+
+In our example, today's water temperature is the dependent variable and yesterday's water temperature and today's air temperature are the independent variables.
 
 #### What is model error?
 
@@ -323,7 +330,7 @@ mod_predictions_watertemp(lake_df2, pred)
 **Answer Q.9** 
 
 
-## 4. Generate a deterministic forecast (without uncertainty)
+## Objective 4. Generate a deterministic forecast (without uncertainty)
 
 ### First Things First: Understanding For-Loops for Ecological Forecasting 
 
@@ -485,7 +492,8 @@ There are many things that contribute to uncertainty when generating a forecast,
 
 Therefore, we need to generate a **probabilistic** forecast which represents both the range of outcomes and also the likelihood of each.  
 
-## 5. Generate a forecast with driver uncertainty
+# Activity B: 
+## Objective 5. Generate a forecast with driver uncertainty
 
 As a first step towards developing a probabilistic forecast, we will generate a forecast that incorporates **driver uncertainty**. Driver uncertainty comes from inaccuracies in the forecasted variables used as inputs to the forecast model. The driver variable for our model is air temperature. To generate a forecast of future water temperature that incorporates driver uncertainty, we need to use all 30 members of the NOAA GEFS air temperature forecast ensemble and generate a water temperature forecast with each one. Together, these 30 water temperature forecasts, each generated using a different NOAA GEFS ensemble member, will comprise an ensemble forecast of water temperature that accounts for driver uncertainty.
 
@@ -553,7 +561,7 @@ plot_forecast(lake_obs,
 
 
 
-## 6. Generate a forecast with parameter uncertainty
+## Objective 6. Generate a forecast with parameter uncertainty
 
 **Parameter uncertainty** refers to the uncertainty in the model parameter values, which can be due to having a limited set of data used to calibrate a model.
 
@@ -676,7 +684,7 @@ plot_forecast(lake_obs,
 
 
 
-## 7. Generate a forecast with process uncertainty
+## Objective 7. Generate a forecast with process uncertainty
 
 **Process uncertainty** is the uncertainty caused by our inability to model all processes as observed in the real world.
 
@@ -751,7 +759,7 @@ plot_forecast(lake_obs,
               title = "Forecast with Process Uncertainty")
 ```
 
-## 8. Generate a forecast with initial conditions uncertainty
+## Objective 8. Generate a forecast with initial conditions uncertainty
 
 **Initial conditions** uncertainty refers to uncertainty arising because the initial conditions are not measured or are imprecisely measured.
 
@@ -839,8 +847,8 @@ plot_forecast(lake_obs,
 
 
 
-
-## 9. Generate a forecast incorporating all sources of uncertainty
+# Activity C:
+## Objective 9. Generate a forecast incorporating all sources of uncertainty
 
 To plot a forecast with all sources of uncertainty incorporated, we need to generate a forecast that incorporates driver, parameter, process, and initial conditions uncertainty.
 
@@ -892,7 +900,7 @@ plot_forecast(lake_obs,
               title = "Forecast with Total Uncertainty")
 ```
 
-## 10. Partition uncertainty 
+## Objective 10. Partition uncertainty 
 
 Now, we will partition the relative contributions of each source of uncertainty to total forecast uncertainty.
 
@@ -930,7 +938,7 @@ plot_partitioned_uc(sd_df)
 
 
 
-## 11. Build and fit your own model
+## Objective 11. Build and fit your own model
 
 For sections 11-13, you will generate forecasts of lake water temperature for 1-7 days into the future using a slightly more complex model. In addition to using today's water temperature and tomorrow's air temperature as predictors of tomorrow's water temperature, you will choose one or more additional weather variables to add as drivers to your model. Then, you will explore how the forecast uncertainty of forecasts made using the multiple linear regression model compares to forecasts made using the simple linear regression model.   
 
@@ -1044,7 +1052,7 @@ mod_predictions_watertemp(lake_df2, pred)
   
   
   
-## 12. Generate forecasts with partitioned uncertainty
+## Objective 12. Generate forecasts with partitioned uncertainty
 
 Below, you will generate forecasts that incorporate **driver**, **parameter**, **process**, and **initial conditions** uncertainty. These forecasts will be needed to compare how forecast uncertainty differs between your new model and the previously fitted model.
 
@@ -1365,7 +1373,7 @@ plot_forecast(lake_obs,
               title = "Forecast with Initial Condition Uncertainty")
 ```
 
-## 13. Compare uncertainty across models.
+## Objective 13. Compare uncertainty across models.
 
 Finally, we will partition the relative contributions of each source of uncertainty to total forecast uncertainty. This will allow us to compare the contributions of each of the four sources of uncertainty (driver, parameter, process, initial conditions) between your model and the previously fitted model.
 

@@ -17,11 +17,11 @@ This module will guide you through an exploration of the sources of uncertainty 
 
 **What is ecological forecast uncertainty?**. 
   
-Uncertainty emerges from some kind of error or imperfection in our knowledge, understanding, and measurement of measure ecological system being investigated.  
+Forecast uncertainty is the range of possible alternate future conditions predicted by a model. We generate multiple different predictions of the future because the future is inherently unknown.    
   
 **Where does ecological forecast uncertainty come from?**
   
-Uncertainty comes from natural variability in the environment and imperfect knowledge and measurements of an ecological system. When generating a forecast, uncertainty can come from the structure of the model used, the conditions the model is initialized with, and the data used to drive the model, among other sources.  
+Uncertainty comes from natural variability in the environment, imperfect representation of an ecological system in a model, and error when measuring the system. When generating a forecast, uncertainty can come from the structure of the model used, the initial conditions of the model, the parameters of the model, and the data used to drive the model, among other sources. 
   
 **Why is uncertainty important to quantify for an ecological forecast?**. 
   
@@ -94,8 +94,8 @@ This module is derived from Moore, T. N., Carey, C.C. and Thomas, R. Q. 13 Octob
   
 -   author: Mary Lofton (@melofton)
 -   contact: [melofton\@vt.edu](mailto:melofton@vt.edu)
--   url: EDDIE PAGE?????
--   date: 2023-03-10
+-   url: https://serc.carleton.edu/eddie/teaching_materials/modules/module6.html
+-   date: 2023-12-12
 -   license: MIT, CC-BY
 -   copyright: Mary Lofton
 
