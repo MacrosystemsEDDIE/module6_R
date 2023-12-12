@@ -1,7 +1,13 @@
 # Macrosystems EDDIE Module 6: Understanding Uncertainty in Ecological Forecasts
   
-This repository is a template for every student's Macrosystems EDDIE Module 6: Understanding Uncertainty in Ecological Forecasts. This is the fifth module of FREC 3044 Environmental Data Science, intended to introduce key concepts and skills to account for uncertainty in ecological forecasts.
-  
+Ecological forecasting is a tool that can be used for understanding and predicting changes in populations, communities, and ecosystems. Ecological forecasting is an emerging approach that provides an estimate of the future state of an ecological system with uncertainty, allowing society to prepare for changes in important ecosystem services. 
+
+Forecast uncertainty is derived from multiple sources, including model parameters and driver data, among others. Knowing the uncertainty associated with a forecast enables forecast users to evaluate the forecast and make more informed decisions. Ecological forecasters develop and update forecasts using the iterative forecasting cycle, in which they make a hypothesis of how an ecological system works; embed their hypothesis in a model; and use the model to make a forecast of future conditions and quantify forecast uncertainty. There are several approaches that forecasters can use to reduce uncertainty, which will be explored in this module.  
+
+This module will guide students through an exploration of the sources of uncertainty within an ecological forecast, how uncertainty can be quantified, and steps that can be taken to reduce the uncertainty in a forecast students develop for a lake ecosystem.  
+
+This repository contains the RMarkdown version of Macrosystems EDDIE Module 6: Understanding Uncertainty in Ecological Forecasts. Instructional materials associated with teaching the module can be found [here](https://serc.carleton.edu/dev/eddie/teaching_materials/modules/module6.html). The module is also available as an [R Shiny application](https://macrosystemseddie.shinyapps.io/module6/) for students and instructors who wish to complete module activities without coding. 
+
 ## Assignment
   
 All work for this assignment is in the `assignment` directory.  Code is contained in the `module6_assignment.Rmd` notebook, and final rendered output files (`module6_assignment.html` and associated files) are in the `assignment` directory as well. The general rubric you will be graded on is found in the `rubric.md` file. 
