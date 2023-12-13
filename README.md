@@ -10,11 +10,11 @@ This repository contains the RMarkdown version of Macrosystems EDDIE Module 6: U
 
 ## Assignment
   
-All work for this assignment is in the `assignment` directory.  Code is contained in the `module6_assignment.Rmd` notebook, and final rendered output files (`module6_assignment.html` and associated files) are in the `assignment` directory as well. The general rubric you will be graded on is found in the `rubric.md` file. 
+All work for this assignment is in the `assignment` directory. Code is contained in the `module6_assignment.Rmd` notebook, and final rendered output files (`module6_assignment.html` and associated files) are in the `assignment` directory as well. The general rubric you will be graded on is found in the `rubric.md` file. 
   
 ## Other files
   
-Additionally this repository, and all student repositories, includes most of the files and folders found here:
+In addition, this repository and all student repositories include most of the files and folders found here:
   
 - `README.md` a general overview of the repository in markdown format.  
 - `lesson.md` a description of the assignment.
@@ -25,7 +25,7 @@ Additionally this repository, and all student repositories, includes most of the
 
 ## How to run the module
 
-Students will need [R](https://www.r-project.org/) and [RStudio](https://posit.co/download/rstudio-desktop/) downloaded on their computers to run this module. Student may access and run the code associated with this module in two ways:
+Students will need [R](https://www.r-project.org/) and [RStudio](https://posit.co/download/rstudio-desktop/) downloaded on their computers to run this module. Students may access and run the code associated with this module in two ways:
 
 ### Option 1: Download a zip file of the code (easiest option)
 1. Click the green "Code" button near the top of the repository page.
