@@ -1,5 +1,5 @@
 # Macrosystems EDDIE Module 6: Understanding Uncertainty in Ecological Forecasts
-[![DOI](https://zenodo.org/badge/611892158.svg)](https://zenodo.org/doi/10.5281/zenodo.10380339)
+[![DOI](https://zenodo.org/badge/611892158.svg)](https://zenodo.org/doi/10.5281/zenodo.10380339)    
 <a href="url"><img src="module_admin/Schematic_Draft_v3.png" align="right" height="220" width="269" ></a>
 Ecological forecasting is a tool that can be used for understanding and predicting changes in populations, communities, and ecosystems. Ecological forecasting is an emerging approach that provides an estimate of the future state of an ecological system with uncertainty, allowing society to prepare for changes in important ecosystem services. 
 
