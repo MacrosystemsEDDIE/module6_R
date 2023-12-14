@@ -14,14 +14,14 @@ All work for this assignment is in the `assignment` directory. Code is contained
   
 ## Other files
   
-In addition, this repository and all student repositories include most of the files and folders found here:
+In addition, this repository includes the following files and folders:
   
 - `README.md` a general overview of the repository in markdown format.  
 - `lesson.md` a description of the assignment.
 - `rubric.md` the rubric for how the module will be assessed.
 - `.gitignore` an optional file, used to ignore common file types we don't want to accidentally commit to GitHub. Most projects should use this. 
-- `*.Rproj` an R-Project file created by RStudio for its own configuration of the repo files. Some people prefer to `.gitignore` this file. It is optional for team repos to ignore or commit their own `<REPO-NAME>.Rproj` file. 
-- `/module_admin` a folder containing data and code required for continued maintenance and development of the module. This folder is not needed to run the module. Students and instructors can `.gitignore` this folder. 
+- `*.Rproj` an R-Project file created by RStudio for its own configuration of the repo files. Some people prefer to `.gitignore` this file. 
+- `/module_admin` a folder containing data and code required to run the module. This folder is needed to complete module activities but students and instructors do not need to modify anything in this folder to run the module.
 
 ## How to run the module
 
