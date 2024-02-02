@@ -1337,7 +1337,7 @@ forecast_ic_unc2 <- tibble(forecast_date = rep(forecasted_dates, times = n_membe
 
 Run forecast. 
 
-**Q.24** Adjust the forecast code below under `#run model` to run your unique model with process uncertainty.
+**Q.24** Adjust the forecast code below under `#run model` to run your unique model with initial conditions uncertainty.
 
 **Answer Q.24** Edit the code block to provide your answer.
 ```{r}
