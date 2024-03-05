@@ -12,7 +12,7 @@ convert_forecast <- function(noaa_fc, start_date){
   
   fc_idx <- fc_data[[start_date]]
   
-  fc_conv_list <- lapply(1:30, function(x) {
+  fc_conv_list <- lapply(1:31, function(x) {
     df <- noaa_fc[[start_date]]
     sub <- df[(df[, 2] %in% c("air_temperature",
                               "surface_downwelling_shortwave_flux_in_air",

@@ -5,9 +5,9 @@
 
 load_noaa_forecast <- function(siteID, start_date){
   
-  fpath <- file.path("data", paste0("NOAA_FC_", siteID))
+  fpath <- file.path("module_admin", paste0("NOAA_FC_", siteID))
   fils <- list.files(fpath)
-  fils <- fils[-c(grep("ens00", fils))]
+  #fils <- fils[-c(grep("ens00", fils))]
   fid <- nc_open(file.path(fpath, fils[1]))
   vars <- fid$var # Extract variable names for selection
   fc_vars <- c("air_temperature", "surface_downwelling_shortwave_flux_in_air", "wind_speed") # names(vars)
@@ -17,11 +17,11 @@ load_noaa_forecast <- function(siteID, start_date){
     idx <- which(start_date == dat)
     
     fils <- list.files(fpath)
-    fils <- fils[-c(grep("ens00", fils))]
+    #fils <- fils[-c(grep("ens00", fils))]
     
     for( i in seq_len(length(fils))) {
       
-      fid <- ncdf4::nc_open(file.path("data", "NOAA_FC_BARC", fils[i]))
+      fid <- ncdf4::nc_open(file.path("module_admin", "NOAA_FC_BARC", fils[i]))
       tim = ncdf4::ncvar_get(fid, "time")
       tunits = ncdf4::ncatt_get(fid, "time")
       lnam = tunits$long_name

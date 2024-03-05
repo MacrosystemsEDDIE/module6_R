@@ -6,7 +6,7 @@ library(ncdf4)
 library(neonUtilities)
 
 #define NEON token
-source("./data/neon_token_source.R")
+source("./module_admin/neon_token_source.R")
 
 ####DATA WRANGLING FOR LAKE DATA####
 
@@ -52,7 +52,7 @@ xvar <- plyr::ddply(xvar, c("Date"), function(x) mean(x[, 2], na.rm = TRUE))
 
 # Read in surface water temperature data
 # We are calling this "yvar" because it is the variable we are trying to predict
-yvar <- read.csv("./data/BARC_wtemp_celsius.csv")
+yvar <- read.csv("./module_admin/BARC_wtemp_celsius.csv")
 
 # Data wrangling to reformat dates
 yvar$Date <- as.Date(yvar[, 1])
@@ -96,8 +96,8 @@ write.csv(lake_df2, file = "./data/BARC_lakedata.csv", row.names = FALSE)
 
 
 ####DATA WRANGLING FOR NOAA FORECAST ####
-source("./data/load_noaa_forecast.R")
-source("./data/convert_forecast.R")
+source("./module_admin/load_noaa_forecast.R")
+source("./module_admin/convert_forecast.R")
 library(reshape)
 
 
@@ -121,7 +121,5 @@ ggplot(data = out$met_forecast, aes(x = forecast_date, y = value))+
   geom_point()+
   theme_bw()
 
-write.csv(out$met_forecast, file = "./data/BARC_forecast_NOAA_GEFS.csv", row.names = FALSE)
-write.csv(out$airtemp_fc, file = "./data/BARC_airt_forecast_NOAA_GEFS.csv", row.names = FALSE)
 write.csv(out$met_forecast, file = "./assignment/data/BARC_forecast_NOAA_GEFS.csv", row.names = FALSE)
 write.csv(out$airtemp_fc, file = "./assignment/data/BARC_airt_forecast_NOAA_GEFS.csv", row.names = FALSE)
