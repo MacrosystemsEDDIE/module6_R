@@ -508,7 +508,19 @@ Therefore, we need to generate a **probabilistic** forecast which represents bot
 # Activity B: 
 ## Objective 5. Generate a forecast with driver uncertainty
 
-As a first step towards developing a probabilistic forecast, we will generate a forecast that incorporates **driver uncertainty**. Driver uncertainty comes from inaccuracies in the forecasted variables used as inputs to the forecast model. The driver variable for our model is air temperature. To generate a forecast of future water temperature that incorporates driver uncertainty, we need to use all 31 members of the NOAA GEFS air temperature forecast ensemble and generate a water temperature forecast with each one. Together, these 31 water temperature forecasts, each generated using a different NOAA GEFS ensemble member, will comprise an ensemble forecast of water temperature that accounts for driver uncertainty.
+As a first step towards developing a probabilistic forecast, we will generate a forecast that incorporates **driver uncertainty**. Driver uncertainty comes from inaccuracies in the forecasted variables used as inputs to the forecast model. Run the following code chunk and examine the slides to learn more about driver uncertainty.
+
+```{r pressure, echo=FALSE, out.width = '80%'}
+knitr::include_graphics("./images/driver_uc_slides/Slide1.png")
+knitr::include_graphics("./images/driver_uc_slides/Slide2.png")
+knitr::include_graphics("./images/driver_uc_slides/Slide3.png")
+knitr::include_graphics("./images/driver_uc_slides/Slide4.png")
+knitr::include_graphics("./images/driver_uc_slides/Slide5.png")
+knitr::include_graphics("./images/driver_uc_slides/Slide6.png")
+
+```
+
+The driver variable for our model is air temperature. To generate a forecast of future water temperature that incorporates driver uncertainty, we need to use all 31 members of the NOAA GEFS air temperature forecast ensemble and generate a water temperature forecast with each one. Together, these 31 water temperature forecasts, each generated using a different NOAA GEFS ensemble member, will comprise an ensemble forecast of water temperature that accounts for driver uncertainty.
 
 Set number of ensemble members; notice we now use the entire NOAA forecast ensemble with 31 members.
 
