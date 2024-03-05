@@ -974,18 +974,18 @@ all_forecast_df <- bind_rows(forecast_driver_unc, forecast_parameter_unc) %>%
   bind_rows(forecast_ic_unc)
 ```
 
-Group the dataframe by date and the type of uncertainty included in the forecast, then calculate the standard deviation across all 31 ensemble members for each date and uncertainty type.
+Group the dataframe by date and the type of uncertainty included in the forecast, then calculate the variance across all 31 ensemble members for each date and uncertainty type. **Notice** that variance has units of degrees Celsius squared.
 
 ```{r}
-sd_df <- all_forecast_df %>%
+variance_df <- all_forecast_df %>%
   group_by(forecast_date, uc_type) %>%
-  summarize(sd = sd(value, na.rm = TRUE), .groups = "drop")
+  summarize(variance = var(value, na.rm = TRUE), .groups = "drop")
 ```
 
 Plot the contribution of each source of uncertainty to total forecast uncertainty. This should resemble the uncertainty quantification plot in the R Shiny app, Activity C, Objective 10 ("Atemp" model).
 
 ```{r}
-plot_partitioned_uc(sd_df)
+plot_partitioned_uc(variance_df)
 ```
 
 **Q.16 (Shiny)** Which source of uncertainty contributes the most to total forecast uncertainty? 
@@ -1450,24 +1450,24 @@ Finally, we will partition the relative contributions of each source of uncertai
 Combine the forecasts with a single source of uncertainty into one dataframe.
 ```{r}
 all_forecast_df2 <- bind_rows(forecast_driver_unc2, forecast_parameter_unc2) %>%
-  bind_rows(., forecast_process_unc2) %>%
-  bind_rows(., forecast_ic_unc2)
+  bind_rows(forecast_process_unc2) %>%
+  bind_rows(forecast_ic_unc2)
 ```
 
-Group the dataframe by date and the type of uncertainty included in the forecast, then calculate the standard deviation across all 31 ensemble members for each date and uncertainty type.
+Group the dataframe by date and the type of uncertainty included in the forecast, then calculate the variance across all 31 ensemble members for each date and uncertainty type. **Notice** that variance has units of degrees Celsius squared.
 
 ```{r}
-sd_df2 <- all_forecast_df2 %>%
+variance_df2 <- all_forecast_df2 %>%
   group_by(forecast_date, uc_type) %>%
-  summarize(sd = sd(value, na.rm = TRUE)) %>%
+  summarize(variance = var(value, na.rm = TRUE)) %>%
   ungroup()
 ```
 
 Plot the contribution of each source of uncertainty to the total forecast uncertainty for both your model and the previously fitted model.
 
 ```{r}
-plot_partitioned_uc(sd_df2)
-plot_partitioned_uc(sd_df)
+plot_partitioned_uc(variance_df2)
+plot_partitioned_uc(variance_df)
 ```
 
 **Q.25** Which source of uncertainty contributes the most to total forecast uncertainty for your model?
