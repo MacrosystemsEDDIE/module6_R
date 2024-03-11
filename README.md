@@ -12,7 +12,7 @@ This repository contains the RMarkdown version of Macrosystems EDDIE Module 6: U
 
 ## Assignment
   
-All work for this assignment is in the `assignment` directory. Code is contained in the `module6_assignment.Rmd` notebook, and final rendered output files (`module6_assignment.html` and associated files) are in the `assignment` directory as well. The general rubric you will be graded on is found in the `rubric.md` file. 
+All work for this assignment is in the `assignment` directory. Code is contained in the `module6.Rmd` notebook, and final rendered output files (`module6.html`) will be generated in the `assignment` directory as well. The general rubric you will be graded on is found in the `rubric.md` file. 
   
 ## Other files
   

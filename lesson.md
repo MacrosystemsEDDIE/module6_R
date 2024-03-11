@@ -56,7 +56,7 @@ Example code is provided for steps 1-5, and you will be asked several short answ
 
 ## Instructions
   - Attend the introductory PowerPoint lecture provided by your instructor; slides may be downloaded [here](https://d32ogoqmya1dw8.cloudfront.net/files/eddie/teaching_materials/modules/instructors_powerpoint_16626467611382673378.pptx)
-  - Open the notebook `assignment/module6_assignment.Rmd` in RStudio
+  - Open the notebook `assignment/module6.Rmd` in RStudio
   - Work through the exercises described in the notebook.
   - `knit` + commit output files to GitHub
 
@@ -77,7 +77,7 @@ Optional pre-class readings and videos:
   
 **Articles:**  
   
-1. Silver, N. (2012) Chapter 6: How to drown in three feet of water. Pages 176-203 in The Signal and the Noise: Why so many Predictions Fail – but some Don't. Penguin Books.  
+1. Silver, N. 2012. The Signal and the Noise: Why so many Predictions Fail – but some Don't. Penguin Books.  
 2. Dietze, M., & Lynch, H. (2019). Forecasting a bright future for ecology. Frontiers in Ecology and the Environment, 17(1), 3. https://doi.org/10.1002/fee.1994. 
 3. Dietze, M. C., Fox, A., Beck-Johnson, L. M., Betancourt, J. L., Hooten, M. B., Jarnevich, C. S., Keitt, T. H., Kenney, M. A., Laney, C. M., Larsen, L. G., Loescher, H. W., Lunch, C. K., Pijanowski, B. C., Randerson, J. T., Read, E. K., Tredennick, A. T., Vargas, R., Weathers, K. C., & White, E. P. (2018). Iterative near-term ecological forecasting: Needs, opportunities, and challenges. Proceedings of the National Academy of Sciences, 115(7), 1424–1432. https://doi.org/10.1073/pnas.1710231115 
   
@@ -90,7 +90,7 @@ Optional pre-class readings and videos:
   
 ## References
   
-This module is derived from Moore, T. N., Carey, C.C. and Thomas, R. Q. 13 October 2021. Macrosystems EDDIE: Understanding Uncertainty in Ecological Forecasts. Macrosystems EDDIE Module 6, Version 1. http://module6.macrosystemseddie.org. Module development was supported by NSF grants DEB-1926050 and DBI-1933016.  
+This module is derived from Moore, T. N., Lofton, M.E., Carey, C.C. and Thomas, R. Q. 13 October 2021. Macrosystems EDDIE: Understanding Uncertainty in Ecological Forecasts. Macrosystems EDDIE Module 6, Version 2. http://module6.macrosystemseddie.org. Module development was supported by NSF grants DEB-1926050 and DBI-1933016.  
   
 -   author: Mary Lofton (@melofton)
 -   contact: [melofton\@vt.edu](mailto:melofton@vt.edu)
