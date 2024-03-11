@@ -55,10 +55,25 @@ mod_predictions_watertemp <- function(lake_df2, pred){
 plot_forecast <- function(lake_obs, forecast, forecast_start_date, title){
   cols <- RColorBrewer::brewer.pal(8, "Dark2") # Set custom color palette for our plot - ooh we are fancy!! :-)
   
+  label_df <- tibble(forecast_date = format(unique(forecast$forecast_date),"%b %d"),
+                     timestep = c("\n t+0","\n t+1","\n t+2","\n t+3","\n t+4","\n t+5","\n t+6","\n t+7")) %>%
+    mutate(labels = paste0(forecast_date, timestep)) 
+  
+  forecast <- forecast %>%
+    mutate(forecast_date = format(forecast_date, "%b %d")) %>%
+    left_join(label_df) %>%
+    mutate(labels = factor(labels, levels = c(unique(label_df$labels))))
+  
+  lake_obs <- lake_obs %>%
+    mutate(forecast_date = format(date, "%b %d")) %>%
+    left_join(label_df) %>%
+    mutate(labels = factor(labels, levels = c(unique(label_df$labels)))) %>%
+    filter(!is.na(labels))
+  
   ggplot() +
-    geom_point(data = lake_obs, aes(x = date, y = wtemp, color = "Observed water temp.")) +
-    geom_line(data = forecast, aes(x = forecast_date, y = value, color = "Forecasted water temp.", group = ensemble_member)) +
-    geom_vline(xintercept = as_date(forecast_start_date), linetype = "dashed") +
+    geom_line(data = forecast, aes(x = labels, y = value, color = "Forecasted water temp.", group = ensemble_member)) +
+    geom_point(data = lake_obs, aes(x = labels, y = wtemp, color = "Observed water temp.")) +
+    geom_vline(xintercept = forecast$labels[1], linetype = "dashed") +
     ylab("Temperature (\u00B0C)") +
     theme_bw(base_size = 12) +
     scale_color_manual(values = c("Forecasted water temp." = cols[1],"Observed water temp." = cols[2]),
@@ -98,16 +113,26 @@ plot_ic_dist <- function(curr_wt, ic_uc){
     ggtitle("Initial condition distribution")
 }
 
-plot_partitioned_uc <- function(sd_df){
+plot_partitioned_uc <- function(variance_df){
   cols2 <- ggthemes::ggthemes_data$colorblind$value # Set another custom plot color palette
   
+  label_df <- tibble(forecast_date = format(unique(variance_df$forecast_date),"%b %d"),
+                     timestep = c("\n t+0","\n t+1","\n t+2","\n t+3","\n t+4","\n t+5","\n t+6","\n t+7")) %>%
+    mutate(labels = paste0(forecast_date, timestep)) 
+  
+  variance_df <- variance_df %>%
+    mutate(forecast_date = format(forecast_date, "%b %d")) %>%
+    left_join(label_df) %>%
+    mutate(labels = factor(labels, levels = c(unique(label_df$labels))))
+  
   ggplot() +
-    geom_bar(data = sd_df, aes(x = forecast_date, y = sd, fill = uc_type), stat = "identity", position = "stack") +
-    ylab("Standard Deviation (\u00B0C)") +
+    geom_bar(data = variance_df, aes(x = labels, y = variance, fill = uc_type), stat = "identity", position = "stack") +
+    ylab(expression(paste("Variance (\u00B0",C^2,")"))) +
     xlab("Forecasted date") +
+    geom_vline(xintercept = variance_df$labels[1], linetype = "dashed") +
     scale_fill_manual(values = c("process" = cols2[1], "parameter" = cols2[2], "initial_conditions" = cols2[3],
                                  "driver" = cols2[4])) +
-    scale_x_date(date_breaks = "1 day", date_labels = "%b %d") +
+    #scale_x_date(date_breaks = "1 day", date_labels = "%b %d") +
     labs(fill = "Uncertainty") +
     theme_bw(base_size = 12)
 }

@@ -101,10 +101,13 @@ Finally, we will source - which means read in the code and functions from - an R
 # install.packages("lubridate")
 # install.packages("RColorBrewer")
 # install.packages("ggthemes")
+# install.packages("knitr")
+
 library(tidyverse)
 library(lubridate)
 library(RColorBrewer)
 library(ggthemes)
+library(knitr)
 
 set.seed(100)
 
@@ -508,7 +511,18 @@ Therefore, we need to generate a **probabilistic** forecast which represents bot
 # Activity B: 
 ## Objective 5. Generate a forecast with driver uncertainty
 
-As a first step towards developing a probabilistic forecast, we will generate a forecast that incorporates **driver uncertainty**. Driver uncertainty comes from inaccuracies in the forecasted variables used as inputs to the forecast model. The driver variable for our model is air temperature. To generate a forecast of future water temperature that incorporates driver uncertainty, we need to use all 31 members of the NOAA GEFS air temperature forecast ensemble and generate a water temperature forecast with each one. Together, these 31 water temperature forecasts, each generated using a different NOAA GEFS ensemble member, will comprise an ensemble forecast of water temperature that accounts for driver uncertainty.
+As a first step towards developing a probabilistic forecast, we will generate a forecast that incorporates **driver uncertainty**. Driver uncertainty comes from inaccuracies in the forecasted variables used as inputs to the forecast model. Run the following code chunk and examine the slides to learn more about driver uncertainty.
+
+```{r, echo=FALSE, out.width = '80%'}
+knitr::include_graphics("./images/driver_uc_slides/Slide1.png")
+knitr::include_graphics("./images/driver_uc_slides/Slide2.png")
+knitr::include_graphics("./images/driver_uc_slides/Slide3.png")
+knitr::include_graphics("./images/driver_uc_slides/Slide4.png")
+knitr::include_graphics("./images/driver_uc_slides/Slide5.png")
+knitr::include_graphics("./images/driver_uc_slides/Slide6.png")
+```
+
+The driver variable for our model is air temperature. To generate a forecast of future water temperature that incorporates driver uncertainty, we need to use all 31 members of the NOAA GEFS air temperature forecast ensemble and generate a water temperature forecast with each one. Together, these 31 water temperature forecasts, each generated using a different NOAA GEFS ensemble member, will comprise an ensemble forecast of water temperature that accounts for driver uncertainty.
 
 Set number of ensemble members; notice we now use the entire NOAA forecast ensemble with 31 members.
 
@@ -578,13 +592,25 @@ plot_forecast(lake_obs,
 
 **Parameter uncertainty** refers to the uncertainty in the model parameter values, which can be due to having a limited set of data used to calibrate a model.
 
-With traditional modelling efforts, people general find one set of the 'best fit' parameters and use them to predict with their model. 
+With traditional modelling efforts, people generally find one set of the 'best fit' parameters and use them to predict with their model. 
 
-This method does not account for the uncertainty around the estimation of these parameters.  
+This method does not account for the uncertainty around the estimation of these parameters.
 
 There is often the possibility that different parameter sets can yield similar metrics of model performance, e.g., similar R-squared values.
 
-Using parameter distributions allows for a better representation of the potential predicted outcomes, leading to better quantification of the uncertainty.  
+Using parameter distributions allows for a better representation of the potential predicted outcomes, leading to better quantification of the uncertainty. Run the following code chunk and examine the slides to learn more about parameter uncertainty.
+
+```{r, echo=FALSE, out.width = '80%'}
+knitr::include_graphics("./images/param_uc_slides/Slide1.png")
+knitr::include_graphics("./images/param_uc_slides/Slide2.png")
+knitr::include_graphics("./images/param_uc_slides/Slide3.png")
+knitr::include_graphics("./images/param_uc_slides/Slide4.png")
+knitr::include_graphics("./images/param_uc_slides/Slide5.png")
+knitr::include_graphics("./images/param_uc_slides/Slide6.png")
+knitr::include_graphics("./images/param_uc_slides/Slide7.png")
+knitr::include_graphics("./images/param_uc_slides/Slide8.png")
+knitr::include_graphics("./images/param_uc_slides/Slide9.png")
+```
 
 Here, you will use the standard errors of the parameters we estimated to generate distributions around each model parameter. You will then use these parameter distributions to incorporate parameter uncertainty into your water temperature forecasts.
 
@@ -699,7 +725,20 @@ plot_forecast(lake_obs,
 
 ## Objective 7. Generate a forecast with process uncertainty
 
-**Process uncertainty** is the uncertainty caused by our inability to model all processes as observed in the real world.
+**Process uncertainty** is the uncertainty caused by our inability to model all processes as observed in the real world. Run the following code chunk and examine the slides to learn more about process uncertainty.
+
+```{r, echo=FALSE, out.width = '80%'}
+knitr::include_graphics("./images/proc_uc_slides/Slide01.png")
+knitr::include_graphics("./images/proc_uc_slides/Slide02.png")
+knitr::include_graphics("./images/proc_uc_slides/Slide03.png")
+knitr::include_graphics("./images/proc_uc_slides/Slide04.png")
+knitr::include_graphics("./images/proc_uc_slides/Slide05.png")
+knitr::include_graphics("./images/proc_uc_slides/Slide06.png")
+knitr::include_graphics("./images/proc_uc_slides/Slide07.png")
+knitr::include_graphics("./images/proc_uc_slides/Slide08.png")
+knitr::include_graphics("./images/proc_uc_slides/Slide09.png")
+knitr::include_graphics("./images/proc_uc_slides/Slide10.png")
+```
 
 Our "simple" water temperature model uses today's water temperature and tomorrow's forecasted air temperature to forecast tomorrow's water temperature. 
 
@@ -774,7 +813,18 @@ plot_forecast(lake_obs,
 
 ## Objective 8. Generate a forecast with initial conditions uncertainty
 
-**Initial conditions** uncertainty refers to uncertainty arising because the initial conditions are not measured or are imprecisely measured.
+**Initial conditions** uncertainty refers to uncertainty arising because the initial conditions are not measured or are imprecisely measured. Run the following code chunk and examine the slides to learn more about initial conditions uncertainty.
+
+```{r, echo=FALSE, out.width = '80%'}
+knitr::include_graphics("./images/ic_uc_slides/Slide1.png")
+knitr::include_graphics("./images/ic_uc_slides/Slide2.png")
+knitr::include_graphics("./images/ic_uc_slides/Slide3.png")
+knitr::include_graphics("./images/ic_uc_slides/Slide4.png")
+knitr::include_graphics("./images/ic_uc_slides/Slide5.png")
+knitr::include_graphics("./images/ic_uc_slides/Slide6.png")
+knitr::include_graphics("./images/ic_uc_slides/Slide7.png")
+knitr::include_graphics("./images/ic_uc_slides/Slide8.png")
+```
 
 Even though we have measurements of water temperature from our lake, we know that water temperature varies throughout the day so this measurement might not capture exactly the temperature in our lake at this time. Additionally, there may be observation error in our temperature measurements.
 
@@ -924,18 +974,18 @@ all_forecast_df <- bind_rows(forecast_driver_unc, forecast_parameter_unc) %>%
   bind_rows(forecast_ic_unc)
 ```
 
-Group the dataframe by date and the type of uncertainty included in the forecast, then calculate the standard deviation across all 31 ensemble members for each date and uncertainty type.
+Group the dataframe by date and the type of uncertainty included in the forecast, then calculate the variance across all 31 ensemble members for each date and uncertainty type. **Notice** that variance has units of degrees Celsius squared.
 
 ```{r}
-sd_df <- all_forecast_df %>%
+variance_df <- all_forecast_df %>%
   group_by(forecast_date, uc_type) %>%
-  summarize(sd = sd(value, na.rm = TRUE), .groups = "drop")
+  summarize(variance = var(value, na.rm = TRUE), .groups = "drop")
 ```
 
 Plot the contribution of each source of uncertainty to total forecast uncertainty. This should resemble the uncertainty quantification plot in the R Shiny app, Activity C, Objective 10 ("Atemp" model).
 
 ```{r}
-plot_partitioned_uc(sd_df)
+plot_partitioned_uc(variance_df)
 ```
 
 **Q.16 (Shiny)** Which source of uncertainty contributes the most to total forecast uncertainty? 
@@ -1400,24 +1450,24 @@ Finally, we will partition the relative contributions of each source of uncertai
 Combine the forecasts with a single source of uncertainty into one dataframe.
 ```{r}
 all_forecast_df2 <- bind_rows(forecast_driver_unc2, forecast_parameter_unc2) %>%
-  bind_rows(., forecast_process_unc2) %>%
-  bind_rows(., forecast_ic_unc2)
+  bind_rows(forecast_process_unc2) %>%
+  bind_rows(forecast_ic_unc2)
 ```
 
-Group the dataframe by date and the type of uncertainty included in the forecast, then calculate the standard deviation across all 31 ensemble members for each date and uncertainty type.
+Group the dataframe by date and the type of uncertainty included in the forecast, then calculate the variance across all 31 ensemble members for each date and uncertainty type. **Notice** that variance has units of degrees Celsius squared.
 
 ```{r}
-sd_df2 <- all_forecast_df2 %>%
+variance_df2 <- all_forecast_df2 %>%
   group_by(forecast_date, uc_type) %>%
-  summarize(sd = sd(value, na.rm = TRUE)) %>%
+  summarize(variance = var(value, na.rm = TRUE)) %>%
   ungroup()
 ```
 
 Plot the contribution of each source of uncertainty to the total forecast uncertainty for both your model and the previously fitted model.
 
 ```{r}
-plot_partitioned_uc(sd_df2)
-plot_partitioned_uc(sd_df)
+plot_partitioned_uc(variance_df2)
+plot_partitioned_uc(variance_df)
 ```
 
 **Q.25** Which source of uncertainty contributes the most to total forecast uncertainty for your model?
