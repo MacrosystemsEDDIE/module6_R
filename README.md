@@ -36,7 +36,7 @@ Students will need [R](https://www.r-project.org/) and [RStudio](https://posit.c
 
 ### Option 2: Create an R Project (advanced option)
 1. If you don't already have one, [make a GitHub account](https://github.com/join).
-2. Near the top of the repository page, click the "Fork" button to create your own copy of the module code repository in your GitHub account.
+2. Near the top of the repository page, click the "Use this template" button, and then "Create a new repository" to create your own copy of the module code repository in your GitHub account.
 3. Open RStudio on your computer.
 4. In the top right corner, click the "Project: (None)" button.
 5. In the dropdown menu, click "New Project".
